@@ -1,0 +1,640 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>Karnataka · Distributor coverage</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root{--ink:#1d1d1f;--mut:#6b6b73;--line:#e6e7eb;--good:#1a9641;--bad:#d7191c;--bg:#f5f6f8;--acc:#4f46e5;--ease:cubic-bezier(.4,0,.2,1)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;font:13px/1.35 -apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+body{display:flex;flex-direction:column}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;background:#fff;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.lft{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tabs,.mode{display:flex;background:#f1f1f4;border-radius:12px;padding:4px;gap:2px}
+.tab,.mode button{display:inline-flex;align-items:center;gap:7px;border:none;background:none;padding:7px 14px;border-radius:9px;
+     font-weight:700;font-size:13px;cursor:pointer;color:var(--mut);transition:all .2s var(--ease)}
+.tab.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.mode button.on{background:var(--ink);color:#fff}
+.tab .bdg{background:#ef4444;color:#fff;border-radius:999px;font-size:10.5px;padding:1px 7px;font-weight:800}
+.right{display:flex;align-items:center;gap:10px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid #d8d8de;background:#fff;border-radius:999px;padding:6px 13px;
+     font-weight:600;font-size:12px;cursor:pointer;color:var(--ink);text-decoration:none;transition:all .2s}
+.btn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.dl{border-color:#0d9488;color:#0f766e}.dl svg{width:15px;height:15px}
+.dl:hover{background:#0d9488;color:#fff;border-color:#0d9488}
+.fsb{position:relative;display:inline-flex;align-items:center;gap:9px;border:none;border-radius:999px;padding:9px 20px;font-size:13.5px;
+     font-weight:700;color:#fff;cursor:pointer;overflow:hidden;background:linear-gradient(120deg,#4f46e5,#7c3aed,#db2777,#7c3aed,#4f46e5);
+     background-size:300% 100%;box-shadow:0 4px 14px rgba(124,58,237,.35);animation:flow 6s linear infinite;transition:transform .25s var(--ease)}
+.fsb:hover{transform:translateY(-2px)}.fsb svg{width:18px;height:18px;transition:transform .55s var(--ease)}
+.fsb.on{background:linear-gradient(120deg,#0f172a,#334155,#e11d48,#334155,#0f172a);background-size:300% 100%}
+.fsb.on svg{transform:rotate(180deg)}
+@keyframes flow{0%{background-position:0% 50%}100%{background-position:300% 50%}}
+.views{flex:1;min-height:0;position:relative}
+.view{position:absolute;inset:0;display:flex;flex-direction:column;visibility:hidden;opacity:0;transition:opacity .3s var(--ease)}
+.view.on{visibility:visible;opacity:1}
+.kpis{display:grid;gap:10px;padding:8px 16px}
+.mk{background:#fff;border:1px solid var(--line);border-left:4px solid var(--acc);border-radius:10px;padding:6px 12px;min-width:0}
+.mh{display:flex;align-items:center;gap:8px;margin-bottom:2px}.mh b{font-size:12.5px}
+.tag{background:var(--acc);color:#fff;font-weight:800;font-size:10.5px;border-radius:5px;padding:1px 7px}
+.popf{display:flex;gap:4px;margin:4px 0 6px;flex-wrap:wrap}
+.popf button{border:1.5px solid #d6d9e0;background:#fff;border-radius:7px;padding:2px 9px;font-size:11px;font-weight:700;cursor:pointer;color:#334155;transition:all .15s}
+.popf button:hover{border-color:var(--acc);color:var(--acc)}
+.popf button.on{background:#0f766e;border-color:#0f766e;color:#fff;box-shadow:0 2px 6px rgba(15,118,110,.3)}
+.popf small{align-self:center;color:var(--mut);font-size:10.5px;margin-left:4px}
+.kt{width:100%;border-collapse:collapse;font-size:12px;font-variant-numeric:tabular-nums}
+.kt th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);font-weight:700;text-align:right;padding:3px 5px;border-bottom:1px solid var(--line)}
+.kt td{padding:3px 5px;text-align:right;font-weight:700;white-space:nowrap}
+.kt td:first-child,.kt th:first-child{text-align:left;font-weight:600}
+.kt td small{font-weight:500;color:var(--mut);margin-left:2px}
+.kt .dt{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.kt .covered .dt{background:var(--good)}.kt .uncovered .dt{background:var(--bad)}
+.kt .covered td:first-child{color:var(--good)}.kt .uncovered td:first-child{color:var(--bad)}
+.kt .tot td{border-top:1px solid var(--line)}
+.nets{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;margin-top:4px}
+.nets b{display:block;font-size:17px;font-variant-numeric:tabular-nums}.nets span{font-size:11px;color:var(--mut)}
+.main,.amain{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 450px;gap:10px;padding:0 16px 12px;transition:grid-template-columns .45s var(--ease)}
+.amain{padding-top:10px;grid-template-columns:minmax(0,1fr) 470px}
+body.noside .main{grid-template-columns:minmax(0,1fr) 0px;gap:0}
+body.noside #v_main .side{opacity:0;pointer-events:none;border-color:transparent}
+.mapbox{position:relative;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;min-height:0}
+.mapdiv{position:absolute;inset:0}
+.side{background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;min-height:0;min-width:0;overflow:hidden;transition:opacity .3s}
+.side h2{font-size:13px;margin:0;padding:10px 12px 6px;display:flex;justify-content:space-between;align-items:center;white-space:nowrap}
+.side h2 span{font-weight:500;color:var(--mut);font-size:11.5px}
+#lp{position:absolute;top:10px;right:10px;z-index:1000;width:258px;max-height:calc(100% - 20px);overflow:auto;background:rgba(255,255,255,.97);
+    border-radius:12px;box-shadow:0 4px 18px rgba(0,0,0,.16);font-size:12px}
+.lph{display:flex;justify-content:space-between;align-items:center;padding:8px 10px 4px}.lph b{font-size:13px}
+.ic{border:none;background:#f1f1f4;border-radius:7px;width:24px;height:24px;cursor:pointer;font-size:14px}
+#lp.min .lpb{display:none}
+.acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;padding:4px 10px 8px}
+.act{border:1px solid #d8d8de;background:#fff;border-radius:999px;padding:4px;font-size:11px;font-weight:600;cursor:pointer}
+.act:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{padding:6px 10px 8px;border-top:1px solid #eee}
+.gt{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);font-weight:700;margin:2px 0 5px}
+.chips{display:flex;flex-direction:column;gap:5px}
+.chip{display:flex;align-items:center;gap:7px;border:1px solid #e1e1e6;background:#f7f7f9;border-radius:9px;padding:5px 8px;cursor:pointer;
+      opacity:.45;transition:.15s;text-align:left;font-size:11.5px;color:var(--ink)}
+.chip.on{opacity:1;background:#fff;border-color:var(--ink)}
+.chip:not(.on) .sw,.chip:not(.on) .dot{filter:grayscale(1)}
+.sw{width:14px;height:14px;border-radius:3px;border:2px solid;flex:none;box-sizing:border-box}
+.dot{width:12px;height:12px;border-radius:50%;flex:none;border:2px solid #fff;box-shadow:0 0 0 1px #aaa;box-sizing:border-box}
+.dot.sq{border-radius:3px}
+.lb{flex:1;font-weight:600}.ct{font-weight:700;font-size:11px;font-variant-numeric:tabular-nums}
+.seg{display:flex;background:#f1f1f4;border-radius:8px;padding:2px}
+.seg button{flex:1;border:none;background:none;padding:4px;border-radius:6px;cursor:pointer;font-size:11px}
+.seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);font-weight:700}
+.dk{background:none;border:none}
+.dk-b{display:flex;align-items:center;justify-content:center;color:#fff;background:#1e293b;border-radius:5px;font:700 9px/1 -apple-system,"Segoe UI",Arial;
+      border:1.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.45);cursor:pointer;box-sizing:border-box}
+.sfh{display:flex;justify-content:space-between;align-items:center;padding:0 12px 6px}
+.sfh small{color:var(--mut);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clr{border:none;background:none;color:var(--acc);font-weight:700;font-size:11.5px;cursor:pointer;padding:2px 4px;border-radius:6px}
+.schips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 10px;max-height:104px;overflow:auto}
+.sc{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #d6d9e0;background:#fff;border-radius:8px;padding:4px 9px;font-size:11.5px;
+    font-weight:700;cursor:pointer;color:#334155;box-shadow:0 1px 2px rgba(16,24,40,.06);transition:all .15s}
+.sc:hover{border-color:var(--acc);color:var(--acc)}
+.sc small{background:#eef0f5;color:#475569;border-radius:5px;padding:0 6px;font-size:10.5px}
+.sc.on{background:var(--acc);border-color:var(--acc);color:#fff}.sc.on small{background:rgba(255,255,255,.22);color:#fff}
+.tw{overflow:auto;flex:1;margin:0 8px 8px;border:1px solid var(--line);border-radius:8px}
+.stt{width:100%;border-collapse:collapse;font-size:11.5px;font-variant-numeric:tabular-nums}
+.stt th{position:sticky;top:0;z-index:1;background:#f7f8fa;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.04em;
+        font-weight:700;text-align:right;padding:6px 5px;border-bottom:1px solid var(--line);white-space:nowrap}
+.stt th.l{text-align:left}
+.stt td{padding:4px 5px;border-bottom:1px solid #f0f0f3;text-align:right;white-space:nowrap}
+.stt td.l{text-align:left}.stt td.sn{vertical-align:top;border-right:1px solid #f0f0f3;white-space:normal}
+.stt td.g{color:var(--good);font-weight:600}
+.stt tr.sub td{font-weight:700;background:#fafbfc;border-bottom:1px solid var(--line)}
+.stt tfoot td{position:sticky;bottom:0;background:#eef0f5;font-weight:800;padding:6px 5px}
+.sbtn{display:block;width:100%;text-align:left;border:1.5px solid #d6d9e0;background:#fff;border-radius:7px;padding:3px 7px;font-weight:700;
+      font-size:11.5px;cursor:pointer;color:var(--ink)}
+.sbtn:hover{border-color:var(--acc);color:var(--acc)}.sbtn.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.tg{display:inline-block;font-style:normal;font-weight:700;font-size:10px;color:#fff;border-radius:4px;padding:0 5px}
+.abs{position:absolute;top:10px;right:10px;z-index:1000;display:flex;background:rgba(255,255,255,.96);border-radius:9px;padding:3px;box-shadow:0 3px 12px rgba(0,0,0,.15)}
+.abs button{border:none;background:none;padding:5px 10px;border-radius:7px;cursor:pointer;font-size:11.5px}
+.abs button.on{background:var(--ink);color:#fff;font-weight:700}
+.badge{position:absolute;left:10px;bottom:24px;z-index:1000;background:rgba(17,24,39,.85);color:#fff;border-radius:8px;padding:5px 10px;font-weight:600;font-size:11.5px;pointer-events:none}
+.badge i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.leaflet-tooltip.lbl{display:none;background:rgba(17,24,39,.85);color:#fff;border:none;border-radius:6px;padding:2px 7px;font-weight:600;font-size:11px}
+.leaflet-tooltip.lbl:before{display:none}
+.showlbl .leaflet-tooltip.lbl{display:block}
+.hl{animation:hl 1.4s ease-out infinite}@keyframes hl{0%{stroke-opacity:1;stroke-width:3}100%{stroke-opacity:0;stroke-width:14}}
+.mini{border:1.5px solid #d6d9e0;background:#fff;border-radius:7px;padding:3px 10px;font-size:11.5px;font-weight:700;cursor:pointer;color:var(--acc)}
+.mini:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 12px 10px;max-height:40%;overflow:auto}
+.bk{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;cursor:pointer;border:1px solid var(--line);
+    border-left:4px solid var(--bc);background:#fff;border-radius:10px;padding:7px 10px;transition:all .15s}
+.bk:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.08)}
+.bk.on{background:color-mix(in srgb,var(--bc) 9%,#fff);box-shadow:0 0 0 2px var(--bc) inset}
+.bn{font-size:12px;font-weight:700}.bc{font-size:19px;font-weight:800;color:var(--bc);line-height:1.1}
+.bd{font-size:10.5px;color:var(--mut);line-height:1.3}.btop{font-size:10.5px;color:#475569}
+.ash,.ilh{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px 4px;border-top:1px solid var(--line);font-size:12px;font-weight:700}
+.ash small,.ilh small{font-weight:500;color:var(--mut)}
+.alist{max-height:170px;overflow:auto;padding:0 8px 6px}
+.ar{display:grid;grid-template-columns:minmax(0,1fr) 70px 34px 66px;align-items:center;gap:8px;padding:4px 6px;border-radius:7px;cursor:pointer;font-size:11.5px}
+.ar:hover{background:#f7f9ff}.ar.on{background:color-mix(in srgb,var(--bc) 12%,#fff);box-shadow:inset 3px 0 0 var(--bc)}
+.ar .an{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ar .ab{height:6px;background:#eef0f5;border-radius:99px;overflow:hidden}.ar .ab i{display:block;height:100%;background:var(--bc)}
+.ar .ac{font-weight:800;text-align:right}
+.rbtn{display:inline-flex;align-items:center;gap:4px;border:1.5px solid #c7d2fe;background:#eef2ff;color:#3730a3;border-radius:7px;padding:3px 8px;
+      font-size:11px;font-weight:800;cursor:pointer;white-space:nowrap}
+.rbtn svg{width:12px;height:12px}.rbtn:hover{background:var(--acc);border-color:var(--acc);color:#fff}
+.ilist{flex:1;overflow:auto;padding:0 8px 8px}
+.it{display:block;width:100%;text-align:left;border:none;background:none;border-bottom:1px solid #f0f0f3;padding:7px 8px;cursor:pointer;border-radius:8px}
+.it:hover{background:#f7f9ff}.it.on{background:color-mix(in srgb,var(--ic) 12%,#fff);box-shadow:inset 3px 0 0 var(--ic)}
+.it b{display:block;font-size:12px}.it span{display:block;font-size:11px;color:var(--mut)}.it em{font-style:normal;font-size:10.5px;color:#9aa0ad}
+.who{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.who i{font-style:normal;font-size:10.5px;font-weight:700;border-radius:5px;padding:1px 6px}
+.who .wa{color:#3730a3;background:#eef0ff}.who .wa.inf{background:#fff;color:#6366f1;border:1px dashed #a5b4fc}
+.who .wd{color:#0f766e;background:#e6f6f4}
+.empty{padding:20px 12px;color:var(--mut);font-size:12px;text-align:center}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;z-index:5000;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal.on{opacity:1;pointer-events:auto}
+.mbox{background:#fff;border-radius:14px;width:min(1000px,94vw);max-height:86vh;display:flex;flex-direction:column;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.mbox header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.mbox header small{display:block;font-weight:500;color:var(--mut);font-size:11.5px}
+.x{border:none;background:#f1f1f4;border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:16px}
+.hbtns{display:flex;gap:8px}
+.pbtn{border:1.5px solid #d6d9e0;background:#fff;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer}
+.pbtn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.mtw{overflow:auto;padding:0 10px 10px}
+.sct{width:100%;border-collapse:collapse;font-size:12px}
+.sct th{position:sticky;top:0;background:#f7f8fa;color:var(--mut);font-size:10px;text-transform:uppercase;padding:8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.sct th:first-child,.sct td:first-child{text-align:left}
+.sct td{padding:6px 8px;border-bottom:1px solid #f0f0f3;text-align:right}
+.sct td:first-child{font-weight:700}.sct td.z{color:#c3c7d0}.sct td.hot{background:#fde2e2;font-weight:800;color:#b91c1c}.sct td.tot{font-weight:800}
+.cd{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.rp{padding:14px 18px 20px}
+.rp-h{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:14px}
+.rp-h h3{margin:0;font-size:20px}.rp-h p{margin:3px 0 0;color:var(--mut);font-size:12px}
+.big{font-size:30px;font-weight:800;color:#b91c1c;text-align:right;line-height:1}.big small{display:block;font-size:11px;color:var(--mut);font-weight:600}
+.rp-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.rp-card{border:1px solid var(--line);border-top:4px solid var(--bc);border-radius:10px;padding:8px 10px}
+.rp-card b{display:block;font-size:20px;color:var(--bc)}.rp-card span{font-size:11.5px;font-weight:700}
+.rp-meta{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.rp-box{border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+.rp-box h4{margin:0 0 6px;font-size:10.5px;text-transform:uppercase;color:var(--mut)}
+.chips2{display:flex;flex-wrap:wrap;gap:5px}.chips2 i{font-style:normal;font-size:11px;font-weight:700;background:#f1f2f5;border-radius:6px;padding:2px 7px}
+.rp-sec{margin-top:16px}.rp-sec h4{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:14px}
+.rp-sec h4 i{width:12px;height:12px;border-radius:3px;background:var(--bc)}.rp-sec h4 small{color:var(--mut);font-weight:600}
+.rp-why{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.rp-why div{border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.45}
+.rp-why .w{background:#fff7ed;border:1px solid #fed7aa}.rp-why .f{background:#ecfdf5;border:1px solid #a7f3d0}
+.rp-why b{display:block;font-size:10.5px;text-transform:uppercase;margin-bottom:2px}
+.rpt{width:100%;border-collapse:collapse;font-size:11.5px}
+.rpt th{background:#f7f8fa;color:var(--mut);font-size:10px;text-transform:uppercase;text-align:left;padding:6px;border-bottom:1px solid var(--line)}
+.rpt td{padding:5px 6px;border-bottom:1px solid #f0f0f3;vertical-align:top}.rpt td.num{text-align:right;white-space:nowrap}
+.rpt .inf{font-size:10px;color:#6366f1;border:1px dashed #a5b4fc;border-radius:4px;padding:0 4px;margin-left:4px}
+.mapb{border:1px solid #d6d9e0;background:#fff;border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700;cursor:pointer;color:var(--acc)}
+.rp-foot{margin-top:18px;font-size:10.5px;color:var(--mut);border-top:1px solid var(--line);padding-top:8px}
+@media print{
+ html,body{height:auto!important;overflow:visible!important;background:#fff!important}
+ body.printing{display:block}body.printing>*:not(#rptm){display:none!important}
+ body.printing #rptm{position:static;display:block;opacity:1;background:none}
+ body.printing #rptm .mbox{width:100%;max-height:none;box-shadow:none}
+ body.printing #rptm .mtw{overflow:visible;padding:0}body.printing .noprint{display:none!important}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style><script src="kdata_core_1.js"></script><script src="kdata_geo_1.js"></script></head><body>
+<header class="top">
+ <div class="lft">
+  <nav class="tabs"><button class="tab on" data-v="v_main">Coverage map · Karnataka</button>
+   <button class="tab" data-v="v_anom">Anomaly analysis <span class="bdg">1,933</span></button></nav>
+  <div class="mode" id="modeSw"><button data-m="overall">Overall</button><button data-m="p1p2">P1 / P2</button></div>
+ </div>
+ <div class="right">
+  <button class="btn" id="tgl">Hide districts</button>
+  <a class="btn dl" download="Coverage_Report_Karnataka.xlsx" href="Coverage_Report_Karnataka.xlsx">
+   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download report</a>
+  <button class="fsb" id="fsb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>View fullscreen</span></button>
+ </div>
+</header>
+<div class="views">
+ <section class="view on" id="v_main">
+  <div class="kpis" id="kpis"></div>
+  <div class="main">
+   <div class="mapbox"><div id="map" class="mapdiv"></div><div id="lp"></div></div>
+   <aside class="side">
+    <h2>District-wise <span id="dcount"></span></h2>
+    <div class="sfh"><small id="dinfo">Showing all districts · click a district to filter</small><button class="clr" id="dclear">Clear</button></div>
+    <div class="schips" id="dchips"></div>
+    <div class="tw" id="dtable"></div>
+   </aside>
+  </div>
+ </section>
+ <section class="view" id="v_anom">
+  <div class="amain">
+   <div class="mapbox"><div id="amap" class="mapdiv"></div><div class="abs" id="abs"></div><div class="badge" id="badge"></div></div>
+   <aside class="side">
+    <h2>Anomaly buckets <button type="button" class="mini" id="scbtn">ASM scorecard</button></h2>
+    <div class="bgrid"><button type="button" class="bk on" data-b="dclose" style="--bc:#f59e0b"><span class="bn">Distributors too close</span><span class="bc">173</span><span class="bd">Two distributors&#x27; centres are within 2 km — overlapping territories.</span><span class="btop">Top ASM: <b>Harishankar S</b></span></button><button type="button" class="bk" data-b="far" style="--bc:#ef4444"><span class="bn">Outlet far from distributor</span><span class="bc">200</span><span class="bd">Outlet 50 km or more from its distributor&#x27;s centre.</span><span class="btop">Top ASM: <b>JOHN PATTI S</b></span></button><button type="button" class="bk" data-b="dup" style="--bc:#8b5cf6"><span class="bn">Duplicate outlet geotags</span><span class="bc">1,367</span><span class="bd">Two or more outlets share exactly the same lat/long.</span><span class="btop">Top ASM: <b>S SRINIVASA</b></span></button><button type="button" class="bk" data-b="conflict" style="--bc:#0ea5e9"><span class="bn">Territory conflict</span><span class="bc">193</span><span class="bd">Outlets in the same village are mapped to two or more ASMs.</span><span class="btop">Top ASM: <b>Arul A</b></span></button><button type="button" class="bk" data-b="uncov" style="--bc:#10b981"><span class="bn">Uncovered but outlets mapped</span><span class="bc">0</span><span class="bd">Village is Uncovered in the file, but outlets carry its Vt code.</span><span class="btop">Top ASM: <b>—</b></span></button><button type="button" class="bk" data-b="covnone" style="--bc:#db2777"><span class="bn">Covered but no outlets</span><span class="bc">0</span><span class="bd">Village is Covered in the file, but no outlet carries its Vt code.</span><span class="btop">Top ASM: <b>—</b></span></button></div>
+    <div class="ash" id="ash"></div><div class="alist" id="alist"></div>
+    <div class="ilh" id="ilh"></div><div class="ilist" id="ilist"></div>
+   </aside>
+  </div>
+ </section>
+</div>
+<div class="modal" id="scm"><div class="mbox"><header><div><b>ASM scorecard — anomalies by bucket</b>
+ <small>Sorted by total · red = highest in that bucket · click Report to open an ASM's report</small></div><button class="x" id="scx">×</button></header>
+ <div class="mtw"><table class="sct"><thead><tr><th>ASM</th><th><i class="cd" style="background:#f59e0b"></i>Distributors too close</th><th><i class="cd" style="background:#ef4444"></i>Outlet far from distributor</th><th><i class="cd" style="background:#8b5cf6"></i>Duplicate outlet geotags</th><th><i class="cd" style="background:#0ea5e9"></i>Territory conflict</th><th><i class="cd" style="background:#10b981"></i>Uncovered but outlets mapped</th><th><i class="cd" style="background:#db2777"></i>Covered but no outlets</th><th>Total</th><th></th></tr></thead><tbody><tr><td>S SRINIVASA</td><td class="">16</td><td class="">34</td><td class="hot">553</td><td class="">44</td><td class="z">0</td><td class="z">0</td><td class="tot">647</td><td><button type="button" class="rbtn" data-asm="S SRINIVASA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Basavaraj R. Goneppanavar</td><td class="">31</td><td class="">25</td><td class="">389</td><td class="">61</td><td class="z">0</td><td class="z">0</td><td class="tot">506</td><td><button type="button" class="rbtn" data-asm="Basavaraj R. Goneppanavar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Harishankar S</td><td class="hot">50</td><td class="">6</td><td class="">237</td><td class="">71</td><td class="z">0</td><td class="z">0</td><td class="tot">364</td><td><button type="button" class="rbtn" data-asm="Harishankar S"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>JOHN PATTI S</td><td class="">27</td><td class="hot">59</td><td class="">146</td><td class="">17</td><td class="z">0</td><td class="z">0</td><td class="tot">249</td><td><button type="button" class="rbtn" data-asm="JOHN PATTI S"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Arul A</td><td class="">44</td><td class="">8</td><td class="">18</td><td class="hot">77</td><td class="z">0</td><td class="z">0</td><td class="tot">147</td><td><button type="button" class="rbtn" data-asm="Arul A"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Asif Basha</td><td class="">31</td><td class="">33</td><td class="">2</td><td class="">72</td><td class="z">0</td><td class="z">0</td><td class="tot">138</td><td><button type="button" class="rbtn" data-asm="Asif Basha"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>UPENDRA PRAKASH KULKARNI</td><td class="">16</td><td class="">31</td><td class="">2</td><td class="">61</td><td class="z">0</td><td class="z">0</td><td class="tot">110</td><td><button type="button" class="rbtn" data-asm="UPENDRA PRAKASH KULKARNI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Niranjan Shetty</td><td class="">24</td><td class="">1</td><td class="">23</td><td class="">44</td><td class="z">0</td><td class="z">0</td><td class="tot">92</td><td><button type="button" class="rbtn" data-asm="Niranjan Shetty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>0</td><td class="">10</td><td class="">3</td><td class="">9</td><td class="">5</td><td class="z">0</td><td class="z">0</td><td class="tot">27</td><td><button type="button" class="rbtn" data-asm="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>RAJESH KUMAR SINGH</td><td class="">7</td><td class="z">0</td><td class="z">0</td><td class="">2</td><td class="z">0</td><td class="z">0</td><td class="tot">9</td><td><button type="button" class="rbtn" data-asm="RAJESH KUMAR SINGH"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>VAMSHI KRISHNA</td><td class="">5</td><td class="z">0</td><td class="z">0</td><td class="">3</td><td class="z">0</td><td class="z">0</td><td class="tot">8</td><td><button type="button" class="rbtn" data-asm="VAMSHI KRISHNA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Shravan Kumar Singh Kumar singh sik</td><td class="">4</td><td class="z">0</td><td class="z">0</td><td class="">4</td><td class="z">0</td><td class="z">0</td><td class="tot">8</td><td><button type="button" class="rbtn" data-asm="Shravan Kumar Singh Kumar singh sik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Unassigned</td><td class="z">0</td><td class="z">0</td><td class="">7</td><td class="z">0</td><td class="z">0</td><td class="z">0</td><td class="tot">7</td><td><button type="button" class="rbtn" data-asm="Unassigned"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Anand Kumar</td><td class="">4</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">5</td><td><button type="button" class="rbtn" data-asm="Anand Kumar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Gaurav Sharma</td><td class="">4</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">5</td><td><button type="button" class="rbtn" data-asm="Gaurav Sharma"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Thirumeni V R</td><td class="">4</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">5</td><td><button type="button" class="rbtn" data-asm="Thirumeni V R"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>P PERUMAL</td><td class="">4</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">5</td><td><button type="button" class="rbtn" data-asm="P PERUMAL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>PRASHANT PHADATARE</td><td class="">4</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">5</td><td><button type="button" class="rbtn" data-asm="PRASHANT PHADATARE"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Banoth Sravan Kumar</td><td class="">2</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">3</td><td><button type="button" class="rbtn" data-asm="Banoth Sravan Kumar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>SHAIK SHAFI AHMAD</td><td class="">2</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">3</td><td><button type="button" class="rbtn" data-asm="SHAIK SHAFI AHMAD"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>H D Chandan Kumar</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">2</td><td><button type="button" class="rbtn" data-asm="H D Chandan Kumar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>AJAY BABU M</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">2</td><td><button type="button" class="rbtn" data-asm="AJAY BABU M"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>PRATIK PRAYAGRAO KOLHEKAR</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">2</td><td><button type="button" class="rbtn" data-asm="PRATIK PRAYAGRAO KOLHEKAR"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>MILIND PATIL</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">2</td><td><button type="button" class="rbtn" data-asm="MILIND PATIL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>Thanzeer Mohammed S</td><td class="z">0</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">1</td><td><button type="button" class="rbtn" data-asm="Thanzeer Mohammed S"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr><tr><td>RAKESH VISHWAKARMA</td><td class="z">0</td><td class="z">0</td><td class="z">0</td><td class="">1</td><td class="z">0</td><td class="z">0</td><td class="tot">1</td><td><button type="button" class="rbtn" data-asm="RAKESH VISHWAKARMA"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>Report</button></td></tr></tbody></table></div></div></div>
+<div class="modal" id="rptm"><div class="mbox"><header class="noprint"><div><b id="rptTitle">ASM report</b><small>Share with the ASM — what went wrong and how to fix it</small></div>
+ <div class="hbtns"><button class="pbtn" id="rpCsv">Download CSV</button><button class="pbtn pri" id="rpPrint">Print / Save PDF</button><button class="x" id="rpx">×</button></div></header>
+ <div class="mtw"><div class="rp" id="rpbody"></div></div></div></div>
+<script>
+(function () {
+var CAP = 800;
+var GEO = window.KD.GEO, VILL = window.KD.VILL, TYPES = {"overall":["ALL"],"p1p2":["DHQ","P1","P2"]}, DL = ["Bagalkot","Bangalore","Bangalore Rural","Belgaum","Bellary","Bidar","Bijapur","Chamarajanagar","Chikkaballapura","Chikmagalur","Chitradurga","Dakshina Kannada","Davanagere","Dharwad","Gadag","Gulbarga","Hassan","Haveri","Kodagu","Kolar","Koppal","Mandya","Mysore","Raichur","Ramanagara","Shimoga","Tumkur","Udupi","Unknown","Uttara Kannada","Vijayanagara","Yadgir"], DIST = window.KD.DISTS, SPK = window.KD.SPK, MD = {"p1p2":{"label":"P1/P2","types":["DHQ","P1","P2"],"blocks":[{"tag":"DHQ","title":"DHQ markets","acc":"#0f766e","rows":{"Covered":{"v":27,"pop":6989586,"out":14721,"dn":102},"Uncovered":{"v":0,"pop":0,"out":0,"dn":0},"Total":{"v":27,"pop":6989586,"out":14721,"dn":102}}},{"tag":"P1","title":"P1 markets","acc":"#1f4e9c","rows":{"Covered":{"v":228,"pop":6574132,"out":19133,"dn":242},"Uncovered":{"v":29,"pop":507692,"out":0,"dn":0},"Total":{"v":257,"pop":7081824,"out":19133,"dn":242}}},{"tag":"P2","title":"P2 markets","acc":"#8e44ad","rows":{"Covered":{"v":124,"pop":1069222,"out":3380,"dn":134},"Uncovered":{"v":57,"pop":465276,"out":0,"dn":0},"Total":{"v":181,"pop":1534498,"out":3380,"dn":134}}}],"chips":[{"k":"DHQ|Covered","t":"DHQ","s":"Covered","v":27,"lab":"DHQ Covered"},{"k":"P1|Covered","t":"P1","s":"Covered","v":228,"lab":"P1 Covered"},{"k":"P1|Uncovered","t":"P1","s":"Uncovered","v":29,"lab":"P1 Uncovered"},{"k":"P2|Covered","t":"P2","s":"Covered","v":124,"lab":"P2 Covered"},{"k":"P2|Uncovered","t":"P2","s":"Uncovered","v":57,"lab":"P2 Uncovered"}],"districts":[{"name":"Belgaum","di":3,"tot":{"v":51,"cov":42,"pop":1512911,"popc":1373774,"out":2877,"dn":32},"types":[{"t":"DHQ","v":1,"cov":1,"pop":490045,"popc":490045,"out":1259,"dn":7},{"t":"P1","v":27,"cov":24,"pop":731537,"popc":663758,"out":1303,"dn":21},{"t":"P2","v":23,"cov":17,"pop":291329,"popc":219971,"out":315,"dn":17}]},{"name":"Tumkur","di":26,"tot":{"v":24,"cov":23,"pop":671374,"popc":667101,"out":2623,"dn":18},"types":[{"t":"DHQ","v":1,"cov":1,"pop":302143,"popc":302143,"out":1035,"dn":9},{"t":"P1","v":12,"cov":12,"pop":314894,"popc":314894,"out":1236,"dn":11},{"t":"P2","v":11,"cov":10,"pop":54337,"popc":50064,"out":352,"dn":12}]},{"name":"Bagalkot","di":0,"tot":{"v":22,"cov":16,"pop":662921,"popc":555872,"out":804,"dn":12},"types":[{"t":"DHQ","v":1,"cov":1,"pop":111933,"popc":111933,"out":206,"dn":2},{"t":"P1","v":16,"cov":13,"pop":498772,"popc":424782,"out":542,"dn":10},{"t":"P2","v":5,"cov":2,"pop":52216,"popc":19157,"out":56,"dn":2}]},{"name":"Bidar","di":5,"tot":{"v":20,"cov":11,"pop":560935,"popc":476418,"out":578,"dn":11},"types":[{"t":"DHQ","v":1,"cov":1,"pop":214373,"popc":214373,"out":413,"dn":2},{"t":"P1","v":11,"cov":8,"pop":280209,"popc":246444,"out":150,"dn":8},{"t":"P2","v":8,"cov":2,"pop":66353,"popc":15601,"out":15,"dn":2}]},{"name":"Gulbarga","di":15,"tot":{"v":20,"cov":14,"pop":902295,"popc":840292,"out":1108,"dn":17},"types":[{"t":"DHQ","v":1,"cov":1,"pop":533587,"popc":533587,"out":802,"dn":10},{"t":"P1","v":12,"cov":10,"pop":311081,"popc":277379,"out":294,"dn":11},{"t":"P2","v":7,"cov":3,"pop":57627,"popc":29326,"out":12,"dn":4}]},{"name":"Bijapur","di":6,"tot":{"v":19,"cov":11,"pop":669123,"popc":547167,"out":394,"dn":13},"types":[{"t":"DHQ","v":1,"cov":1,"pop":327427,"popc":327427,"out":64,"dn":1},{"t":"P1","v":11,"cov":7,"pop":267698,"popc":184530,"out":251,"dn":9},{"t":"P2","v":7,"cov":3,"pop":73998,"popc":35210,"out":79,"dn":5}]},{"name":"Haveri","di":17,"tot":{"v":19,"cov":15,"pop":440547,"popc":382657,"out":1014,"dn":11},"types":[{"t":"DHQ","v":1,"cov":1,"pop":67102,"popc":67102,"out":71,"dn":1},{"t":"P1","v":10,"cov":9,"pop":311431,"popc":270864,"out":841,"dn":10},{"t":"P2","v":8,"cov":5,"pop":62014,"popc":44691,"out":102,"dn":5}]},{"name":"Raichur","di":23,"tot":{"v":19,"cov":18,"pop":612651,"popc":599617,"out":1813,"dn":16},"types":[{"t":"DHQ","v":1,"cov":1,"pop":234073,"popc":234073,"out":711,"dn":3},{"t":"P1","v":13,"cov":12,"pop":329207,"popc":316173,"out":1024,"dn":13},{"t":"P2","v":5,"cov":5,"pop":49371,"popc":49371,"out":78,"dn":5}]},{"name":"Hassan","di":16,"tot":{"v":18,"cov":18,"pop":409734,"popc":409734,"out":1516,"dn":10},"types":[{"t":"DHQ","v":1,"cov":1,"pop":155006,"popc":155006,"out":491,"dn":2},{"t":"P1","v":10,"cov":10,"pop":213546,"popc":213546,"out":702,"dn":7},{"t":"P2","v":7,"cov":7,"pop":41182,"popc":41182,"out":323,"dn":6}]},{"name":"Mysore","di":22,"tot":{"v":18,"cov":17,"pop":1172304,"popc":1170046,"out":4263,"dn":25},"types":[{"t":"DHQ","v":1,"cov":1,"pop":893062,"popc":893062,"out":2695,"dn":11},{"t":"P1","v":9,"cov":9,"pop":223403,"popc":223403,"out":1265,"dn":12},{"t":"P2","v":8,"cov":7,"pop":55839,"popc":53581,"out":303,"dn":14}]},{"name":"Dakshina Kannada","di":11,"tot":{"v":16,"cov":13,"pop":771184,"popc":747293,"out":1941,"dn":19},"types":[{"t":"DHQ","v":1,"cov":1,"pop":488968,"popc":488968,"out":1284,"dn":10},{"t":"P1","v":7,"cov":7,"pop":221742,"popc":221742,"out":586,"dn":13},{"t":"P2","v":8,"cov":5,"pop":60474,"popc":36583,"out":71,"dn":5}]},{"name":"Mandya","di":21,"tot":{"v":16,"cov":15,"pop":361167,"popc":353755,"out":1491,"dn":17},"types":[{"t":"DHQ","v":1,"cov":1,"pop":137358,"popc":137358,"out":347,"dn":1},{"t":"P1","v":8,"cov":8,"pop":172106,"popc":172106,"out":940,"dn":15},{"t":"P2","v":7,"cov":6,"pop":51703,"popc":44291,"out":204,"dn":7}]},{"name":"Koppal","di":20,"tot":{"v":15,"cov":13,"pop":360486,"popc":348451,"out":977,"dn":15},"types":[{"t":"DHQ","v":1,"cov":1,"pop":70698,"popc":70698,"out":253,"dn":2},{"t":"P1","v":9,"cov":8,"pop":246563,"popc":241704,"out":628,"dn":13},{"t":"P2","v":5,"cov":4,"pop":43225,"popc":36049,"out":96,"dn":4}]},{"name":"Udupi","di":27,"tot":{"v":15,"cov":12,"pop":290122,"popc":269240,"out":651,"dn":10},"types":[{"t":"DHQ","v":1,"cov":1,"pop":125306,"popc":125306,"out":168,"dn":4},{"t":"P1","v":2,"cov":2,"pop":56244,"popc":56244,"out":224,"dn":5},{"t":"P2","v":12,"cov":9,"pop":108572,"popc":87690,"out":259,"dn":8}]},{"name":"Vijayanagara","di":30,"tot":{"v":15,"cov":15,"pop":477086,"popc":477086,"out":1921,"dn":18},"types":[{"t":"DHQ","v":1,"cov":1,"pop":206167,"popc":206167,"out":628,"dn":3},{"t":"P1","v":9,"cov":9,"pop":227595,"popc":227595,"out":1143,"dn":15},{"t":"P2","v":5,"cov":5,"pop":43324,"popc":43324,"out":150,"dn":4}]},{"name":"Chikmagalur","di":9,"tot":{"v":14,"cov":12,"pop":284132,"popc":269462,"out":708,"dn":15},"types":[{"t":"DHQ","v":1,"cov":1,"pop":118401,"popc":118401,"out":36,"dn":1},{"t":"P1","v":10,"cov":8,"pop":152573,"popc":137903,"out":561,"dn":11},{"t":"P2","v":3,"cov":3,"pop":13158,"popc":13158,"out":111,"dn":7}]},{"name":"Kolar","di":19,"tot":{"v":14,"cov":11,"pop":502176,"popc":484171,"out":1080,"dn":14},"types":[{"t":"DHQ","v":1,"cov":1,"pop":138462,"popc":138462,"out":105,"dn":2},{"t":"P1","v":7,"cov":7,"pop":329032,"popc":329032,"out":918,"dn":11},{"t":"P2","v":6,"cov":3,"pop":34682,"popc":16677,"out":57,"dn":3}]},{"name":"Shimoga","di":25,"tot":{"v":14,"cov":12,"pop":647859,"popc":629358,"out":1506,"dn":12},"types":[{"t":"DHQ","v":1,"cov":1,"pop":322650,"popc":322650,"out":1034,"dn":7},{"t":"P1","v":10,"cov":8,"pop":301962,"popc":283461,"out":418,"dn":6},{"t":"P2","v":3,"cov":3,"pop":23247,"popc":23247,"out":54,"dn":3}]},{"name":"Uttara Kannada","di":29,"tot":{"v":14,"cov":11,"pop":408304,"popc":379262,"out":752,"dn":10},"types":[{"t":"DHQ","v":1,"cov":1,"pop":77139,"popc":77139,"out":73,"dn":1},{"t":"P1","v":11,"cov":10,"pop":316327,"popc":302123,"out":679,"dn":9},{"t":"P2","v":2,"cov":0,"pop":14838,"popc":0,"out":0,"dn":0}]},{"name":"Chitradurga","di":10,"tot":{"v":13,"cov":13,"pop":376013,"popc":376013,"out":1637,"dn":11},"types":[{"t":"DHQ","v":1,"cov":1,"pop":145853,"popc":145853,"out":579,"dn":3},{"t":"P1","v":9,"cov":9,"pop":213696,"popc":213696,"out":1006,"dn":10},{"t":"P2","v":3,"cov":3,"pop":16464,"popc":16464,"out":52,"dn":3}]},{"name":"Gadag","di":14,"tot":{"v":12,"cov":9,"pop":405562,"popc":373778,"out":558,"dn":8},"types":[{"t":"DHQ","v":1,"cov":1,"pop":172612,"popc":172612,"out":130,"dn":3},{"t":"P1","v":8,"cov":7,"pop":206697,"popc":190007,"out":408,"dn":6},{"t":"P2","v":3,"cov":1,"pop":26253,"popc":11159,"out":20,"dn":1}]},{"name":"Yadgir","di":31,"tot":{"v":12,"cov":8,"pop":293757,"popc":260283,"out":574,"dn":7},"types":[{"t":"DHQ","v":1,"cov":1,"pop":74294,"popc":74294,"out":124,"dn":1},{"t":"P1","v":5,"cov":5,"pop":156671,"popc":156671,"out":409,"dn":5},{"t":"P2","v":6,"cov":2,"pop":62792,"popc":29318,"out":41,"dn":3}]},{"name":"Bangalore Rural","di":2,"tot":{"v":11,"cov":8,"pop":274537,"popc":255123,"out":607,"dn":12},"types":[{"t":"P1","v":6,"cov":5,"pop":251358,"popc":241771,"out":552,"dn":11},{"t":"P2","v":5,"cov":3,"pop":23179,"popc":13352,"out":55,"dn":4}]},{"name":"Bellary","di":4,"tot":{"v":11,"cov":9,"pop":622102,"popc":604590,"out":1624,"dn":17},"types":[{"t":"DHQ","v":1,"cov":1,"pop":410445,"popc":410445,"out":1049,"dn":7},{"t":"P1","v":5,"cov":4,"pop":148552,"popc":138099,"out":411,"dn":8},{"t":"P2","v":5,"cov":4,"pop":63105,"popc":56046,"out":164,"dn":6}]},{"name":"Chikkaballapura","di":8,"tot":{"v":11,"cov":10,"pop":298538,"popc":288608,"out":1610,"dn":13},"types":[{"t":"DHQ","v":1,"cov":1,"pop":63652,"popc":63652,"out":352,"dn":5},{"t":"P1","v":6,"cov":5,"pop":211556,"popc":201626,"out":1068,"dn":9},{"t":"P2","v":4,"cov":4,"pop":23330,"popc":23330,"out":190,"dn":9}]},{"name":"Dharwad","di":13,"tot":{"v":11,"cov":7,"pop":1104678,"popc":1060067,"out":966,"dn":13},"types":[{"t":"DHQ","v":1,"cov":1,"pop":943788,"popc":943788,"out":382,"dn":6},{"t":"P1","v":5,"cov":5,"pop":105751,"popc":105751,"out":582,"dn":10},{"t":"P2","v":5,"cov":1,"pop":55139,"popc":10528,"out":2,"dn":1}]},{"name":"Ramanagara","di":24,"tot":{"v":11,"cov":8,"pop":299217,"popc":237128,"out":736,"dn":7},"types":[{"t":"DHQ","v":1,"cov":1,"pop":95167,"popc":95167,"out":197,"dn":1},{"t":"P1","v":5,"cov":4,"pop":176522,"popc":122508,"out":454,"dn":7},{"t":"P2","v":5,"cov":3,"pop":27528,"popc":19453,"out":85,"dn":3}]},{"name":"Chamarajanagar","di":7,"tot":{"v":10,"cov":8,"pop":214193,"popc":196594,"out":905,"dn":10},"types":[{"t":"DHQ","v":1,"cov":1,"pop":69875,"popc":69875,"out":233,"dn":3},{"t":"P1","v":4,"cov":3,"pop":105099,"popc":96320,"out":538,"dn":9},{"t":"P2","v":5,"cov":4,"pop":39219,"popc":30399,"out":134,"dn":3}]}],"grand":{"v":465,"cov":379,"pop":15605908,"popc":14632940,"out":37234,"dn":325}},"overall":{"label":"All","types":["ALL"],"blocks":[{"tag":"ALL","title":"All villages & towns · Karnataka","acc":"#0f766e","rows":{"Covered":{"v":3119,"pop":22693629,"out":87128,"dn":441},"Uncovered":{"v":24623,"pop":29921770,"out":0,"dn":0},"Total":{"v":27742,"pop":52615399,"out":87128,"dn":441}}}],"chips":[{"k":"ALL|Covered","t":"ALL","s":"Covered","v":3119,"lab":"Covered"},{"k":"ALL|Uncovered","t":"ALL","s":"Uncovered","v":24623,"lab":"Uncovered"}],"districts":[{"name":"Tumkur","di":26,"tot":{"v":2594,"cov":279,"pop":2678980,"popc":990524,"out":4720,"dn":27},"types":[]},{"name":"Hassan","di":16,"tot":{"v":2429,"cov":162,"pop":1776421,"popc":584305,"out":2471,"dn":12},"types":[]},{"name":"Kolar","di":19,"tot":{"v":1615,"cov":91,"pop":1536401,"popc":580059,"out":1948,"dn":22},"types":[]},{"name":"Shimoga","di":25,"tot":{"v":1453,"cov":98,"pop":1752753,"popc":740104,"out":2343,"dn":15},"types":[]},{"name":"Mandya","di":21,"tot":{"v":1377,"cov":171,"pop":1805769,"popc":634128,"out":2627,"dn":22},"types":[]},{"name":"Chikkaballapura","di":8,"tot":{"v":1332,"cov":97,"pop":1255104,"popc":438424,"out":2535,"dn":16},"types":[]},{"name":"Belgaum","di":3,"tot":{"v":1295,"cov":194,"pop":4796889,"popc":2153454,"out":4502,"dn":40},"types":[]},{"name":"Uttara Kannada","di":29,"tot":{"v":1261,"cov":112,"pop":1437169,"popc":659693,"out":1636,"dn":14},"types":[]},{"name":"Mysore","di":22,"tot":{"v":1218,"cov":220,"pop":3001127,"popc":1734172,"out":6349,"dn":29},"types":[]},{"name":"Chikmagalur","di":9,"tot":{"v":1031,"cov":86,"pop":1137961,"popc":389311,"out":1823,"dn":21},"types":[]},{"name":"Bangalore Rural","di":2,"tot":{"v":964,"cov":83,"pop":990923,"popc":374471,"out":1375,"dn":20},"types":[]},{"name":"Chitradurga","di":10,"tot":{"v":956,"cov":94,"pop":1659456,"popc":598333,"out":2327,"dn":12},"types":[]},{"name":"Gulbarga","di":15,"tot":{"v":882,"cov":32,"pop":2566326,"popc":912294,"out":1351,"dn":19},"types":[]},{"name":"Ramanagara","di":24,"tot":{"v":826,"cov":113,"pop":1082636,"popc":408124,"out":1626,"dn":8},"types":[]},{"name":"Raichur","di":23,"tot":{"v":824,"cov":63,"pop":1928812,"popc":715844,"out":2125,"dn":17},"types":[]},{"name":"Davanagere","di":12,"tot":{"v":807,"cov":152,"pop":1862278,"popc":985610,"out":3054,"dn":18},"types":[]},{"name":"Haveri","di":17,"tot":{"v":707,"cov":57,"pop":1680887,"popc":549220,"out":1497,"dn":13},"types":[]},{"name":"Bijapur","di":6,"tot":{"v":685,"cov":20,"pop":2177331,"popc":569910,"out":1191,"dn":16},"types":[]},{"name":"Bagalkot","di":0,"tot":{"v":628,"cov":64,"pop":1889752,"popc":742826,"out":1488,"dn":15},"types":[]},{"name":"Bidar","di":5,"tot":{"v":602,"cov":30,"pop":1703300,"popc":542386,"out":946,"dn":12},"types":[]},{"name":"Koppal","di":20,"tot":{"v":600,"cov":65,"pop":1389920,"popc":524249,"out":1409,"dn":20},"types":[]},{"name":"Bangalore","di":1,"tot":{"v":576,"cov":243,"pop":1141653,"popc":792000,"out":21491,"dn":91},"types":[]},{"name":"Vijayanagara","di":30,"tot":{"v":535,"cov":113,"pop":2452595,"popc":1411095,"out":4076,"dn":37},"types":[]},{"name":"Yadgir","di":31,"tot":{"v":494,"cov":16,"pop":1174271,"popc":276643,"out":834,"dn":7},"types":[]},{"name":"Chamarajanagar","di":7,"tot":{"v":433,"cov":76,"pop":1020791,"popc":428179,"out":1539,"dn":15},"types":[]},{"name":"Dakshina Kannada","di":11,"tot":{"v":372,"cov":152,"pop":2089649,"popc":1394156,"out":3282,"dn":22},"types":[]},{"name":"Dharwad","di":13,"tot":{"v":366,"cov":31,"pop":1829795,"popc":1106443,"out":2552,"dn":18},"types":[]},{"name":"Gadag","di":14,"tot":{"v":331,"cov":22,"pop":1064570,"popc":424361,"out":1215,"dn":9},"types":[]},{"name":"Kodagu","di":18,"tot":{"v":296,"cov":50,"pop":554519,"popc":212614,"out":869,"dn":10},"types":[]},{"name":"Udupi","di":27,"tot":{"v":253,"cov":133,"pop":1177361,"popc":820697,"out":1927,"dn":11},"types":[]}],"grand":{"v":27742,"cov":3119,"pop":52615399,"popc":22693629,"out":87128,"dn":441},"bands":{"0":{"label":"All","types":["ALL"],"blocks":[{"tag":"ALL","title":"All villages & towns · Karnataka","acc":"#0f766e","rows":{"Covered":{"v":3119,"pop":22693629,"out":87128,"dn":441},"Uncovered":{"v":24623,"pop":29921770,"out":0,"dn":0},"Total":{"v":27742,"pop":52615399,"out":87128,"dn":441}}}],"chips":[{"k":"ALL|Covered","t":"ALL","s":"Covered","v":3119,"lab":"Covered"},{"k":"ALL|Uncovered","t":"ALL","s":"Uncovered","v":24623,"lab":"Uncovered"}],"districts":[{"name":"Tumkur","di":26,"tot":{"v":2594,"cov":279,"pop":2678980,"popc":990524,"out":4720,"dn":27},"types":[]},{"name":"Hassan","di":16,"tot":{"v":2429,"cov":162,"pop":1776421,"popc":584305,"out":2471,"dn":12},"types":[]},{"name":"Kolar","di":19,"tot":{"v":1615,"cov":91,"pop":1536401,"popc":580059,"out":1948,"dn":22},"types":[]},{"name":"Shimoga","di":25,"tot":{"v":1453,"cov":98,"pop":1752753,"popc":740104,"out":2343,"dn":15},"types":[]},{"name":"Mandya","di":21,"tot":{"v":1377,"cov":171,"pop":1805769,"popc":634128,"out":2627,"dn":22},"types":[]},{"name":"Chikkaballapura","di":8,"tot":{"v":1332,"cov":97,"pop":1255104,"popc":438424,"out":2535,"dn":16},"types":[]},{"name":"Belgaum","di":3,"tot":{"v":1295,"cov":194,"pop":4796889,"popc":2153454,"out":4502,"dn":40},"types":[]},{"name":"Uttara Kannada","di":29,"tot":{"v":1261,"cov":112,"pop":1437169,"popc":659693,"out":1636,"dn":14},"types":[]},{"name":"Mysore","di":22,"tot":{"v":1218,"cov":220,"pop":3001127,"popc":1734172,"out":6349,"dn":29},"types":[]},{"name":"Chikmagalur","di":9,"tot":{"v":1031,"cov":86,"pop":1137961,"popc":389311,"out":1823,"dn":21},"types":[]},{"name":"Bangalore Rural","di":2,"tot":{"v":964,"cov":83,"pop":990923,"popc":374471,"out":1375,"dn":20},"types":[]},{"name":"Chitradurga","di":10,"tot":{"v":956,"cov":94,"pop":1659456,"popc":598333,"out":2327,"dn":12},"types":[]},{"name":"Gulbarga","di":15,"tot":{"v":882,"cov":32,"pop":2566326,"popc":912294,"out":1351,"dn":19},"types":[]},{"name":"Ramanagara","di":24,"tot":{"v":826,"cov":113,"pop":1082636,"popc":408124,"out":1626,"dn":8},"types":[]},{"name":"Raichur","di":23,"tot":{"v":824,"cov":63,"pop":1928812,"popc":715844,"out":2125,"dn":17},"types":[]},{"name":"Davanagere","di":12,"tot":{"v":807,"cov":152,"pop":1862278,"popc":985610,"out":3054,"dn":18},"types":[]},{"name":"Haveri","di":17,"tot":{"v":707,"cov":57,"pop":1680887,"popc":549220,"out":1497,"dn":13},"types":[]},{"name":"Bijapur","di":6,"tot":{"v":685,"cov":20,"pop":2177331,"popc":569910,"out":1191,"dn":16},"types":[]},{"name":"Bagalkot","di":0,"tot":{"v":628,"cov":64,"pop":1889752,"popc":742826,"out":1488,"dn":15},"types":[]},{"name":"Bidar","di":5,"tot":{"v":602,"cov":30,"pop":1703300,"popc":542386,"out":946,"dn":12},"types":[]},{"name":"Koppal","di":20,"tot":{"v":600,"cov":65,"pop":1389920,"popc":524249,"out":1409,"dn":20},"types":[]},{"name":"Bangalore","di":1,"tot":{"v":576,"cov":243,"pop":1141653,"popc":792000,"out":21491,"dn":91},"types":[]},{"name":"Vijayanagara","di":30,"tot":{"v":535,"cov":113,"pop":2452595,"popc":1411095,"out":4076,"dn":37},"types":[]},{"name":"Yadgir","di":31,"tot":{"v":494,"cov":16,"pop":1174271,"popc":276643,"out":834,"dn":7},"types":[]},{"name":"Chamarajanagar","di":7,"tot":{"v":433,"cov":76,"pop":1020791,"popc":428179,"out":1539,"dn":15},"types":[]},{"name":"Dakshina Kannada","di":11,"tot":{"v":372,"cov":152,"pop":2089649,"popc":1394156,"out":3282,"dn":22},"types":[]},{"name":"Dharwad","di":13,"tot":{"v":366,"cov":31,"pop":1829795,"popc":1106443,"out":2552,"dn":18},"types":[]},{"name":"Gadag","di":14,"tot":{"v":331,"cov":22,"pop":1064570,"popc":424361,"out":1215,"dn":9},"types":[]},{"name":"Kodagu","di":18,"tot":{"v":296,"cov":50,"pop":554519,"popc":212614,"out":869,"dn":10},"types":[]},{"name":"Udupi","di":27,"tot":{"v":253,"cov":133,"pop":1177361,"popc":820697,"out":1927,"dn":11},"types":[]}],"grand":{"v":27742,"cov":3119,"pop":52615399,"popc":22693629,"out":87128,"dn":441}},"1000":{"label":"All","types":["ALL"],"blocks":[{"tag":"ALL","title":"All villages & towns · Karnataka","acc":"#0f766e","rows":{"Covered":{"v":2294,"pop":22282041,"out":78335,"dn":429},"Uncovered":{"v":9976,"pop":23044018,"out":0,"dn":0},"Total":{"v":12270,"pop":45326059,"out":78335,"dn":429}}}],"chips":[{"k":"ALL|Covered","t":"ALL","s":"Covered","v":2294,"lab":"Covered"},{"k":"ALL|Uncovered","t":"ALL","s":"Uncovered","v":9976,"lab":"Uncovered"}],"districts":[{"name":"Belgaum","di":3,"tot":{"v":993,"cov":179,"pop":4622111,"popc":2145644,"out":4261,"dn":38},"types":[]},{"name":"Mysore","di":22,"tot":{"v":670,"cov":167,"pop":2715110,"popc":1708669,"out":6041,"dn":27},"types":[]},{"name":"Tumkur","di":26,"tot":{"v":664,"cov":144,"pop":1820301,"popc":933773,"out":3665,"dn":25},"types":[]},{"name":"Gulbarga","di":15,"tot":{"v":630,"cov":28,"pop":2393465,"popc":909889,"out":1246,"dn":18},"types":[]},{"name":"Bijapur","di":6,"tot":{"v":538,"cov":18,"pop":2080568,"popc":569011,"out":1117,"dn":15},"types":[]},{"name":"Raichur","di":23,"tot":{"v":527,"cov":53,"pop":1753458,"popc":710346,"out":2058,"dn":17},"types":[]},{"name":"Chitradurga","di":10,"tot":{"v":518,"cov":81,"pop":1432210,"popc":591087,"out":2270,"dn":12},"types":[]},{"name":"Mandya","di":21,"tot":{"v":504,"cov":106,"pop":1394985,"popc":603094,"out":2181,"dn":22},"types":[]},{"name":"Haveri","di":17,"tot":{"v":467,"cov":51,"pop":1534246,"popc":545447,"out":1426,"dn":13},"types":[]},{"name":"Bidar","di":5,"tot":{"v":461,"cov":27,"pop":1607196,"popc":540487,"out":764,"dn":11},"types":[]},{"name":"Vijayanagara","di":30,"tot":{"v":453,"cov":106,"pop":2411438,"popc":1408143,"out":4011,"dn":37},"types":[]},{"name":"Davanagere","di":12,"tot":{"v":452,"cov":129,"pop":1669329,"popc":974443,"out":2910,"dn":18},"types":[]},{"name":"Bagalkot","di":0,"tot":{"v":413,"cov":56,"pop":1760190,"popc":739040,"out":1421,"dn":14},"types":[]},{"name":"Koppal","di":20,"tot":{"v":395,"cov":54,"pop":1268184,"popc":518696,"out":1266,"dn":18},"types":[]},{"name":"Shimoga","di":25,"tot":{"v":364,"cov":50,"pop":1295750,"popc":716552,"out":1912,"dn":14},"types":[]},{"name":"Dakshina Kannada","di":11,"tot":{"v":358,"cov":151,"pop":2078506,"popc":1393207,"out":3273,"dn":22},"types":[]},{"name":"Yadgir","di":31,"tot":{"v":356,"cov":13,"pop":1089434,"popc":276407,"out":782,"dn":7},"types":[]},{"name":"Hassan","di":16,"tot":{"v":349,"cov":80,"pop":938590,"popc":542364,"out":2078,"dn":12},"types":[]},{"name":"Ramanagara","di":24,"tot":{"v":308,"cov":77,"pop":829175,"popc":387408,"out":1395,"dn":8},"types":[]},{"name":"Chikmagalur","di":9,"tot":{"v":299,"cov":55,"pop":818797,"popc":373687,"out":1262,"dn":19},"types":[]},{"name":"Bangalore","di":1,"tot":{"v":291,"cov":174,"pop":997899,"popc":756229,"out":20996,"dn":90},"types":[]},{"name":"Chikkaballapura","di":8,"tot":{"v":285,"cov":58,"pop":781682,"popc":415836,"out":2099,"dn":15},"types":[]},{"name":"Uttara Kannada","di":29,"tot":{"v":282,"cov":76,"pop":1083911,"popc":639780,"out":1416,"dn":13},"types":[]},{"name":"Chamarajanagar","di":7,"tot":{"v":273,"cov":64,"pop":953229,"popc":421795,"out":1472,"dn":15},"types":[]},{"name":"Dharwad","di":13,"tot":{"v":273,"cov":21,"pop":1775264,"popc":1101685,"out":1061,"dn":14},"types":[]},{"name":"Kolar","di":19,"tot":{"v":262,"cov":36,"pop":903201,"popc":554019,"out":1304,"dn":18},"types":[]},{"name":"Udupi","di":27,"tot":{"v":247,"cov":132,"pop":1172146,"popc":819833,"out":1922,"dn":11},"types":[]},{"name":"Gadag","di":14,"tot":{"v":238,"cov":21,"pop":1006977,"popc":423687,"out":933,"dn":9},"types":[]},{"name":"Bangalore Rural","di":2,"tot":{"v":230,"cov":45,"pop":661438,"popc":354656,"out":974,"dn":16},"types":[]},{"name":"Kodagu","di":18,"tot":{"v":170,"cov":42,"pop":477269,"popc":207127,"out":819,"dn":9},"types":[]}],"grand":{"v":12270,"cov":2294,"pop":45326059,"popc":22282041,"out":78335,"dn":429}},"5000":{"label":"All","types":["ALL"],"blocks":[{"tag":"ALL","title":"All villages & towns · Karnataka","acc":"#0f766e","rows":{"Covered":{"v":753,"pop":18380867,"out":62839,"dn":415},"Uncovered":{"v":580,"pop":4514703,"out":0,"dn":0},"Total":{"v":1333,"pop":22895570,"out":62839,"dn":415}}}],"chips":[{"k":"ALL|Covered","t":"ALL","s":"Covered","v":753,"lab":"Covered"},{"k":"ALL|Uncovered","t":"ALL","s":"Uncovered","v":580,"lab":"Uncovered"}],"districts":[{"name":"Belgaum","di":3,"tot":{"v":212,"cov":103,"pop":2788755,"popc":1909142,"out":3807,"dn":37},"types":[]},{"name":"Dakshina Kannada","di":11,"tot":{"v":94,"cov":58,"pop":1346915,"popc":1114048,"out":2555,"dn":22},"types":[]},{"name":"Vijayanagara","di":30,"tot":{"v":85,"cov":46,"pop":1482652,"popc":1219777,"out":3650,"dn":33},"types":[]},{"name":"Bijapur","di":6,"tot":{"v":71,"cov":11,"pop":1033054,"popc":547167,"out":394,"dn":13},"types":[]},{"name":"Bagalkot","di":0,"tot":{"v":66,"cov":27,"pop":985628,"popc":651915,"out":921,"dn":14},"types":[]},{"name":"Gulbarga","di":15,"tot":{"v":65,"cov":19,"pop":1214166,"popc":888872,"out":1166,"dn":17},"types":[]},{"name":"Udupi","di":27,"tot":{"v":64,"cov":50,"pop":658462,"popc":565937,"out":1303,"dn":10},"types":[]},{"name":"Mysore","di":22,"tot":{"v":54,"cov":43,"pop":1482532,"popc":1416309,"out":4708,"dn":23},"types":[]},{"name":"Raichur","di":23,"tot":{"v":48,"cov":25,"pop":828011,"popc":643205,"out":1876,"dn":17},"types":[]},{"name":"Bangalore","di":1,"tot":{"v":44,"cov":39,"pop":485245,"popc":445315,"out":19798,"dn":90},"types":[]},{"name":"Haveri","di":17,"tot":{"v":44,"cov":29,"pop":692647,"popc":481775,"out":1177,"dn":12},"types":[]},{"name":"Bidar","di":5,"tot":{"v":41,"cov":16,"pop":697473,"popc":510272,"out":630,"dn":11},"types":[]},{"name":"Chamarajanagar","di":7,"tot":{"v":40,"cov":23,"pop":427142,"popc":302520,"out":1015,"dn":12},"types":[]},{"name":"Koppal","di":20,"tot":{"v":38,"cov":25,"pop":534834,"popc":435332,"out":1095,"dn":18},"types":[]},{"name":"Davanagere","di":12,"tot":{"v":36,"cov":27,"pop":766634,"popc":701775,"out":2224,"dn":13},"types":[]},{"name":"Chitradurga","di":10,"tot":{"v":34,"cov":23,"pop":511329,"popc":443128,"out":1729,"dn":11},"types":[]},{"name":"Uttara Kannada","di":29,"tot":{"v":34,"cov":25,"pop":594956,"popc":519730,"out":1042,"dn":12},"types":[]},{"name":"Mandya","di":21,"tot":{"v":33,"cov":21,"pop":488015,"popc":397926,"out":1431,"dn":18},"types":[]},{"name":"Yadgir","di":31,"tot":{"v":31,"cov":9,"pop":419419,"popc":268312,"out":578,"dn":7},"types":[]},{"name":"Dharwad","di":13,"tot":{"v":30,"cov":11,"pop":1232745,"popc":1076654,"out":592,"dn":14},"types":[]},{"name":"Gadag","di":14,"tot":{"v":30,"cov":12,"pop":546832,"popc":396994,"out":588,"dn":9},"types":[]},{"name":"Tumkur","di":26,"tot":{"v":25,"cov":19,"pop":689528,"popc":654479,"out":2474,"dn":18},"types":[]},{"name":"Hassan","di":16,"tot":{"v":18,"cov":17,"pop":426590,"popc":420865,"out":1443,"dn":10},"types":[]},{"name":"Kodagu","di":18,"tot":{"v":18,"cov":12,"pop":165257,"popc":131157,"out":495,"dn":5},"types":[]},{"name":"Shimoga","di":25,"tot":{"v":15,"cov":11,"pop":666004,"popc":631867,"out":1473,"dn":12},"types":[]},{"name":"Chikmagalur","di":9,"tot":{"v":14,"cov":11,"pop":290459,"popc":269536,"out":628,"dn":15},"types":[]},{"name":"Bangalore Rural","di":2,"tot":{"v":13,"cov":10,"pop":310448,"popc":288969,"out":675,"dn":13},"types":[]},{"name":"Chikkaballapura","di":8,"tot":{"v":13,"cov":12,"pop":312926,"popc":302996,"out":1590,"dn":13},"types":[]},{"name":"Kolar","di":19,"tot":{"v":13,"cov":10,"pop":517063,"popc":499058,"out":1038,"dn":13},"types":[]},{"name":"Ramanagara","di":24,"tot":{"v":10,"cov":9,"pop":299849,"popc":245835,"out":744,"dn":7},"types":[]}],"grand":{"v":1333,"cov":753,"pop":22895570,"popc":18380867,"out":62839,"dn":415}},"10000":{"label":"All","types":["ALL"],"blocks":[{"tag":"ALL","title":"All villages & towns · Karnataka","acc":"#0f766e","rows":{"Covered":{"v":340,"pop":15533904,"out":56138,"dn":392},"Uncovered":{"v":76,"pop":1208528,"out":0,"dn":0},"Total":{"v":416,"pop":16742432,"out":56138,"dn":392}}}],"chips":[{"k":"ALL|Covered","t":"ALL","s":"Covered","v":340,"lab":"Covered"},{"k":"ALL|Uncovered","t":"ALL","s":"Uncovered","v":76,"lab":"Uncovered"}],"districts":[{"name":"Belgaum","di":3,"tot":{"v":67,"cov":50,"pop":1770867,"popc":1519069,"out":3326,"dn":36},"types":[]},{"name":"Bagalkot","di":0,"tot":{"v":23,"cov":17,"pop":700087,"popc":587015,"out":801,"dn":12},"types":[]},{"name":"Vijayanagara","di":30,"tot":{"v":23,"cov":21,"pop":1077009,"popc":1040737,"out":3090,"dn":29},"types":[]},{"name":"Bijapur","di":6,"tot":{"v":20,"cov":10,"pop":689330,"popc":539170,"out":359,"dn":13},"types":[]},{"name":"Raichur","di":23,"tot":{"v":20,"cov":14,"pop":645213,"popc":572208,"out":1729,"dn":15},"types":[]},{"name":"Uttara Kannada","di":29,"tot":{"v":19,"cov":17,"pop":486663,"popc":461657,"out":962,"dn":12},"types":[]},{"name":"Bangalore","di":1,"tot":{"v":17,"cov":16,"pop":296526,"popc":283137,"out":19377,"dn":90},"types":[]},{"name":"Gulbarga","di":15,"tot":{"v":17,"cov":12,"pop":908240,"popc":837179,"out":1109,"dn":17},"types":[]},{"name":"Dakshina Kannada","di":11,"tot":{"v":16,"cov":15,"pop":842480,"popc":830279,"out":2083,"dn":20},"types":[]},{"name":"Bidar","di":5,"tot":{"v":14,"cov":9,"pop":517977,"popc":462464,"out":563,"dn":10},"types":[]},{"name":"Gadag","di":14,"tot":{"v":14,"cov":10,"pop":435556,"popc":384853,"out":577,"dn":8},"types":[]},{"name":"Udupi","di":27,"tot":{"v":14,"cov":13,"pop":341810,"popc":330199,"out":645,"dn":10},"types":[]},{"name":"Haveri","di":17,"tot":{"v":13,"cov":11,"pop":476855,"popc":353069,"out":981,"dn":10},"types":[]},{"name":"Mysore","di":22,"tot":{"v":13,"cov":13,"pop":1200953,"popc":1200953,"out":3962,"dn":22},"types":[]},{"name":"Tumkur","di":26,"tot":{"v":12,"cov":12,"pop":609048,"popc":609048,"out":2235,"dn":17},"types":[]},{"name":"Koppal","di":20,"tot":{"v":11,"cov":9,"pop":352104,"popc":321515,"out":881,"dn":14},"types":[]},{"name":"Mandya","di":21,"tot":{"v":11,"cov":10,"pop":334174,"popc":324053,"out":1207,"dn":15},"types":[]},{"name":"Dharwad","di":13,"tot":{"v":10,"cov":6,"pop":1091973,"popc":1042839,"out":571,"dn":13},"types":[]},{"name":"Davanagere","di":12,"tot":{"v":9,"cov":8,"pop":591666,"popc":581471,"out":2030,"dn":12},"types":[]},{"name":"Yadgir","di":31,"tot":{"v":9,"cov":7,"pop":277580,"popc":252739,"out":538,"dn":6},"types":[]},{"name":"Chitradurga","di":10,"tot":{"v":8,"cov":8,"pop":343014,"popc":343014,"out":1480,"dn":9},"types":[]},{"name":"Hassan","di":16,"tot":{"v":8,"cov":8,"pop":359261,"popc":359261,"out":1135,"dn":8},"types":[]},{"name":"Shimoga","di":25,"tot":{"v":8,"cov":7,"pop":617888,"popc":603360,"out":1380,"dn":11},"types":[]},{"name":"Chamarajanagar","di":7,"tot":{"v":7,"cov":5,"pop":206798,"popc":179269,"out":783,"dn":10},"types":[]},{"name":"Chikmagalur","di":9,"tot":{"v":7,"cov":7,"pop":244924,"popc":244924,"out":534,"dn":11},"types":[]},{"name":"Kolar","di":19,"tot":{"v":7,"cov":7,"pop":480073,"popc":480073,"out":990,"dn":11},"types":[]},{"name":"Bangalore Rural","di":2,"tot":{"v":6,"cov":6,"pop":260801,"popc":260801,"out":555,"dn":12},"types":[]},{"name":"Chikkaballapura","di":8,"tot":{"v":5,"cov":5,"pop":255837,"popc":255837,"out":1382,"dn":11},"types":[]},{"name":"Ramanagara","di":24,"tot":{"v":5,"cov":4,"pop":261772,"popc":207758,"out":602,"dn":7},"types":[]},{"name":"Kodagu","di":18,"tot":{"v":3,"cov":3,"pop":65953,"popc":65953,"out":271,"dn":3},"types":[]}],"grand":{"v":416,"cov":340,"pop":16742432,"popc":15533904,"out":56138,"dn":392}},"20000":{"label":"All","types":["ALL"],"blocks":[{"tag":"ALL","title":"All villages & towns · Karnataka","acc":"#0f766e","rows":{"Covered":{"v":170,"pop":13140878,"out":30935,"dn":272},"Uncovered":{"v":10,"pop":378578,"out":0,"dn":0},"Total":{"v":180,"pop":13519456,"out":30935,"dn":272}}}],"chips":[{"k":"ALL|Covered","t":"ALL","s":"Covered","v":170,"lab":"Covered"},{"k":"ALL|Uncovered","t":"ALL","s":"Uncovered","v":10,"lab":"Uncovered"}],"districts":[{"name":"Belgaum","di":3,"tot":{"v":17,"cov":15,"pop":1075619,"popc":1017831,"out":2242,"dn":23},"types":[]},{"name":"Vijayanagara","di":30,"tot":{"v":13,"cov":12,"pop":948885,"popc":923066,"out":2812,"dn":24},"types":[]},{"name":"Bagalkot","di":0,"tot":{"v":10,"cov":8,"pop":517661,"popc":463402,"out":539,"dn":9},"types":[]},{"name":"Gulbarga","di":15,"tot":{"v":9,"cov":8,"pop":815399,"popc":789713,"out":1028,"dn":15},"types":[]},{"name":"Haveri","di":17,"tot":{"v":8,"cov":6,"pop":406203,"popc":282417,"out":780,"dn":7},"types":[]},{"name":"Uttara Kannada","di":29,"tot":{"v":8,"cov":8,"pop":327748,"popc":327748,"out":553,"dn":7},"types":[]},{"name":"Raichur","di":23,"tot":{"v":7,"cov":7,"pop":467101,"popc":467101,"out":1415,"dn":12},"types":[]},{"name":"Tumkur","di":26,"tot":{"v":7,"cov":7,"pop":534246,"popc":534246,"out":1849,"dn":15},"types":[]},{"name":"Bidar","di":5,"tot":{"v":6,"cov":6,"pop":416014,"popc":416014,"out":519,"dn":8},"types":[]},{"name":"Bijapur","di":6,"tot":{"v":6,"cov":5,"pop":501978,"popc":464752,"out":274,"dn":5},"types":[]},{"name":"Dakshina Kannada","di":11,"tot":{"v":6,"cov":6,"pop":699973,"popc":699973,"out":1758,"dn":16},"types":[]},{"name":"Gadag","di":14,"tot":{"v":6,"cov":6,"pop":326246,"popc":326246,"out":474,"dn":8},"types":[]},{"name":"Hassan","di":16,"tot":{"v":6,"cov":6,"pop":324449,"popc":324449,"out":938,"dn":8},"types":[]},{"name":"Kolar","di":19,"tot":{"v":6,"cov":6,"pop":469660,"popc":469660,"out":897,"dn":10},"types":[]},{"name":"Mandya","di":21,"tot":{"v":6,"cov":6,"pop":275119,"popc":275119,"out":955,"dn":9},"types":[]},{"name":"Mysore","di":22,"tot":{"v":6,"cov":6,"pop":1102876,"popc":1102876,"out":3569,"dn":19},"types":[]},{"name":"Bangalore Rural","di":2,"tot":{"v":5,"cov":5,"pop":250234,"popc":250234,"out":552,"dn":11},"types":[]},{"name":"Chikkaballapura","di":8,"tot":{"v":5,"cov":5,"pop":255837,"popc":255837,"out":1382,"dn":11},"types":[]},{"name":"Yadgir","di":31,"tot":{"v":5,"cov":5,"pop":221446,"popc":221446,"out":517,"dn":5},"types":[]},{"name":"Bangalore","di":1,"tot":{"v":4,"cov":4,"pop":120241,"popc":120241,"out":451,"dn":11},"types":[]},{"name":"Chikmagalur","di":9,"tot":{"v":4,"cov":4,"pop":211217,"popc":211217,"out":403,"dn":8},"types":[]},{"name":"Chitradurga","di":10,"tot":{"v":4,"cov":4,"pop":285833,"popc":285833,"out":1236,"dn":6},"types":[]},{"name":"Davanagere","di":12,"tot":{"v":4,"cov":4,"pop":525835,"popc":525835,"out":1709,"dn":9},"types":[]},{"name":"Koppal","di":20,"tot":{"v":4,"cov":4,"pop":240209,"popc":240209,"out":660,"dn":12},"types":[]},{"name":"Ramanagara","di":24,"tot":{"v":4,"cov":3,"pop":248728,"popc":194714,"out":498,"dn":5},"types":[]},{"name":"Shimoga","di":25,"tot":{"v":4,"cov":4,"pop":564317,"popc":564317,"out":1257,"dn":10},"types":[]},{"name":"Chamarajanagar","di":7,"tot":{"v":3,"cov":3,"pop":155129,"popc":155129,"out":675,"dn":9},"types":[]},{"name":"Dharwad","di":13,"tot":{"v":3,"cov":3,"pop":996668,"popc":996668,"out":473,"dn":8},"types":[]},{"name":"Udupi","di":27,"tot":{"v":3,"cov":3,"pop":201204,"popc":201204,"out":392,"dn":8},"types":[]},{"name":"Kodagu","di":18,"tot":{"v":1,"cov":1,"pop":33381,"popc":33381,"out":128,"dn":3},"types":[]}],"grand":{"v":180,"cov":170,"pop":13519456,"popc":13140878,"out":30935,"dn":272}}},"bandlist":[0,1000,5000,10000,20000]}}, NET = {"dist":441,"outlets":87128,"geo":87128,"spk":31};
+var BK = window.KD.BK, AF = window.KD.AF, AM = {"dclose":{"name":"Distributors too close","color":"#f59e0b","total":173,"desc":"Two distributors' centres are within 2 km — overlapping territories.","wrong":"Two distributors operate from almost the same spot (their outlet centres are within 2 km). They are likely serving the same villages and outlets — overlap, duplicate onboarding or outlet poaching.","action":"Compare both distributors' outlet lists and routes. Give each village/outlet to one distributor and remove duplicates; if both are needed, split the beats clearly."},"far":{"name":"Outlet far from distributor","color":"#ef4444","total":200,"desc":"Outlet 50 km or more from its distributor's centre.","wrong":"The outlet is 50 km or more away from the centre of its distributor's outlets — wrong geotag, or mapped to the wrong distributor.","action":"Verify the outlet's location. Re-capture the geotag at the shop, or re-map the outlet to the distributor that actually serves it."},"dup":{"name":"Duplicate outlet geotags","color":"#8b5cf6","total":1367,"desc":"Two or more outlets share exactly the same lat/long.","wrong":"Different outlets carry exactly the same lat-long — tagged from one spot (distributor point / office / one shop) or coordinates copied.","action":"Ask the DSE to re-capture each outlet's geotag standing at that outlet. Do not reuse coordinates between outlets."},"conflict":{"name":"Territory conflict","color":"#0ea5e9","total":193,"desc":"Outlets in the same village are mapped to two or more ASMs.","wrong":"One village is being served under more than one ASM, so ownership of the territory is unclear and effort may be duplicated.","action":"Agree a single ASM for the village. Re-map the outlets / distributors so the village sits in one ASM's territory."},"uncov":{"name":"Uncovered but outlets mapped","color":"#10b981","total":0,"desc":"Village is Uncovered in the file, but outlets carry its Vt code.","wrong":"The master list says Uncovered, yet outlets in the distributor file are tagged to this village.","action":"Update the village to Covered in the master list — or, if those outlets are not really there, correct their Vt code."},"covnone":{"name":"Covered but no outlets","color":"#db2777","total":0,"desc":"Village is Covered in the file, but no outlet carries its Vt code.","wrong":"The master list says Covered, but no outlet in the distributor file is tagged to this village.","action":"Check whether outlets here are tagged to another Vt code and correct it — or mark the village Uncovered if it is not served."}}, AA = {"dclose":[["Harishankar S",50],["Arul A",44],["Basavaraj R. Goneppanavar",31],["Asif Basha",31],["JOHN PATTI S",27],["Niranjan Shetty",24],["S SRINIVASA",16],["UPENDRA PRAKASH KULKARNI",16],["0",10],["RAJESH KUMAR SINGH",7],["VAMSHI KRISHNA",5],["Anand Kumar",4],["Shravan Kumar Singh Kumar singh sik",4],["Gaurav Sharma",4],["Thirumeni V R",4],["P PERUMAL",4],["PRASHANT PHADATARE",4],["Banoth Sravan Kumar",2],["SHAIK SHAFI AHMAD",2],["H D Chandan Kumar",1],["AJAY BABU M",1],["PRATIK PRAYAGRAO KOLHEKAR",1]],"far":[["JOHN PATTI S",59],["S SRINIVASA",34],["Asif Basha",33],["UPENDRA PRAKASH KULKARNI",31],["Basavaraj R. Goneppanavar",25],["Arul A",8],["Harishankar S",6],["0",3],["Niranjan Shetty",1]],"dup":[["S SRINIVASA",553],["Basavaraj R. Goneppanavar",389],["Harishankar S",237],["JOHN PATTI S",146],["Niranjan Shetty",23],["Arul A",18],["0",9],["Unassigned",7],["Asif Basha",2],["UPENDRA PRAKASH KULKARNI",2],["MILIND PATIL",1]],"conflict":[["Arul A",77],["Asif Basha",72],["Harishankar S",71],["UPENDRA PRAKASH KULKARNI",61],["Basavaraj R. Goneppanavar",61],["Niranjan Shetty",44],["S SRINIVASA",44],["JOHN PATTI S",17],["0",5],["Shravan Kumar Singh Kumar singh sik",4],["VAMSHI KRISHNA",3],["RAJESH KUMAR SINGH",2],["Thirumeni V R",1],["Anand Kumar",1],["Gaurav Sharma",1],["PRASHANT PHADATARE",1],["P PERUMAL",1],["PRATIK PRAYAGRAO KOLHEKAR",1],["Thanzeer Mohammed S",1],["Banoth Sravan Kumar",1],["RAKESH VISHWAKARMA",1],["SHAIK SHAFI AHMAD",1],["AJAY BABU M",1],["MILIND PATIL",1],["H D Chandan Kumar",1]],"uncov":[],"covnone":[]}, BORDER = ["dclose","far","dup","conflict","uncov","covnone"];
+var AL = {}; Object.keys(AF).forEach(function (k) { AL[k] = AF[k].slice(0, CAP); });
+var ALL = [[11.5835689569186,74.0563030000655],[18.45725901379,78.5887889681963]], PS = {"Covered":{"fill":"#1a9641","line":"#0f6b2e","op":0.3},"Uncovered":{"fill":"#d7191c","line":"#99110f","op":0.16}}, DASH = {"DHQ":null,"P1":null,"P2":"5 4","P3":"2 4","ALL":null}, ACC = {"DHQ":"#0f766e","P1":"#1f4e9c","P2":"#8e44ad","P3":"#b45309","ALL":"#0f766e"}, PAL = ["#2563eb","#8e44ad","#f28e2b","#00897b","#e377c2","#795548","#17becf","#3949ab","#d35400","#6d4c41"], NC = {"dist":"#1e293b","spoke":"#f59e0b","outlet":"#2563eb"}, BASES = [{"label":"Street","url":"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png","attr":"© OpenStreetMap contributors"},{"label":"Light","url":"https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png","attr":"© OpenStreetMap, © CARTO"},{"label":"Satellite","url":"https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}","attr":"Esri World Imagery"}], BIDX = 0;
+var DEFB = "dclose", GEN = "13 Nov 2026, 15:10", UNASG = "Unassigned", STATE = "Karnataka", ICON_DOC = "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z\"/><path d=\"M14 3v5h5M9 13h6M9 17h6\"/><\/svg>";
+var mode = "p1p2";
+var curPop = 0;
+function MDc() { return mode === "overall" ? MD.overall.bands[String(curPop)] : MD[mode]; }
+function popLab(t) { return t === 0 ? "All" : "≥" + (t >= 1000 ? (t / 1000) + "K" : t); }
+function e(t) { return String(t === null || t === undefined ? "" : t).replace(/[&<>"]/g, function (c) { return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function fmt(n) { return (+n || 0).toLocaleString("en-US"); }
+function pc(a, b) { return b ? Math.round(100 * a / b) : 0; }
+function fmtc(n) { n = +n || 0; return n >= 1e7 ? (n / 1e7).toFixed(2) + " Cr" : n >= 1e5 ? (n / 1e5).toFixed(1) + " L" : fmt(n); }
+function setBase(m, tl, i, box) {
+  tl.forEach(function (t, j) { if (j === i) { if (!m.hasLayer(t)) t.addTo(m); t.bringToBack(); } else if (m.hasLayer(t)) m.removeLayer(t); });
+  if (box) Array.prototype.forEach.call(box.querySelectorAll("button"), function (c, j) { c.classList.toggle("on", j === i); });
+}
+function mkTiles() { return BASES.map(function (b) { return L.tileLayer(b.url, {attribution: b.attr, maxZoom: 19, subdomains: "abc"}); }); }
+
+/* ================= MAIN MAP ================= */
+var map = L.map("map", {preferCanvas: true}); map.fitBounds(ALL); L.control.scale({imperial: false}).addTo(map);
+var tiles = mkTiles(), baseIdx = BIDX; setBase(map, tiles, baseIdx, null);
+var VG = {}, dsel = null;
+function buildMode(m) {
+  if (VG[m]) return VG[m];
+  var groups = {}, items = [], on = {};
+  VILL[m].forEach(function (v) {
+    var geo = GEO[v[0]]; if (!geo) return;
+    var t = TYPES[m][v[1]], s = v[2] ? "Covered" : "Uncovered", st = PS[s], k = t + "|" + s;
+    var l = L.geoJSON({type: "Feature", geometry: geo}, {style: {fillColor: st.fill, color: st.line, weight: t === "DHQ" ? 2.2 : 1.1,
+              fillOpacity: st.op, dashArray: DASH[t] || null}});
+    l.bindTooltip("<b>" + e(v[4]) + "</b>" + (t !== "ALL" ? " · " + e(t) : "") + " · " + s + (v[8] ? " (corrected)" : "") +
+                  "<br>District: " + e(DL[v[3]]) + "<br>Outlets mapped: " + fmt(v[6]) + " · file: " + fmt(v[7]) +
+                  (v[5] ? "<br>Pop: " + fmt(v[5]) : ""), {sticky: true});
+    (groups[k] = groups[k] || L.layerGroup()).addLayer(l); on[k] = true;
+    items.push({l: l, k: k, d: v[3], p: v[5]});
+  });
+  VG[m] = {groups: groups, items: items, on: on};
+  return VG[m];
+}
+var DG = L.layerGroup().addTo(map), SG = L.layerGroup().addTo(map), OG = L.layerGroup(), EX = L.layerGroup().addTo(map);
+var net = {dist: true, spk: true, out: false}, open = {}, pi = 0, outBuilt = false;
+function dicon(d, ring) {
+  var sz = 16 + Math.min(String(d.n).length, 5) * 3.2, sh = ring ? "box-shadow:0 0 0 3px " + ring + ",0 1px 4px rgba(0,0,0,.5);" : "";
+  return L.divIcon({className: "dk", iconSize: [sz, sz], iconAnchor: [sz / 2, sz / 2],
+    html: '<div class="dk-b" style="width:' + sz + 'px;height:' + sz + 'px;' + sh + '">' + fmt(d.n) + '</div>'});
+}
+function closeD(i) { var o = open[i]; if (!o) return; EX.removeLayer(o.g); o.d._mk.setIcon(dicon(o.d, null)); delete open[i]; }
+function collapseAll() { Object.keys(open).forEach(closeD); }
+function toggleD(d, i) {
+  if (open[i]) { closeD(i); return; }
+  if (!d.o.length) return;
+  var c = PAL[pi++ % PAL.length], g = L.layerGroup();
+  d.o.forEach(function (p) {
+    L.polyline([[d.la, d.lo], [p[0], p[1]]], {color: c, weight: 1, opacity: 0.75, interactive: false}).addTo(g);
+    L.circleMarker([p[0], p[1]], {radius: 3, color: "#fff", weight: 0.8, fillColor: c, fillOpacity: 1})
+      .bindTooltip("Outlet " + e(p[2]) + (p[3] > -1 ? "<br>DSE: " + e(d.dse[p[3]]) : "")).addTo(g);
+  });
+  EX.addLayer(g); if (!map.hasLayer(EX)) map.addLayer(EX);
+  open[i] = {g: g, d: d}; d._mk.setIcon(dicon(d, c));
+}
+DIST.forEach(function (d, i) {
+  if (d.la === null) return;
+  var mk = L.marker([d.la, d.lo], {icon: dicon(d, null), riseOnHover: true});
+  mk.bindTooltip("<b>" + e(d.nm) + "</b><br>" + fmt(d.n) + " outlets" + (d.ng !== d.n ? " (" + fmt(d.ng) + " geotagged)" : "") +
+                 "<br>ASM: " + e(d.asm || UNASG) + "<br>" + e(DL[d.dd] || ""));
+  mk.on("click", function () { toggleD(d, i); });
+  d._mk = mk; DG.addLayer(mk);
+});
+SPK.forEach(function (s) {
+  var m = L.circleMarker([s[0], s[1]], {radius: 4.5, color: "#fff", weight: 1.2, fillColor: NC.spoke, fillOpacity: 1});
+  m.bindTooltip("<b>" + e(s[2]) + "</b> · spoke" + (s[3] ? "<br>SubD: " + e(s[3]) : "") + (s[4] ? "<br>DSE: " + e(s[4]) : "") + (s[5] ? "<br>ASM: " + e(s[5]) : ""));
+  s._m = m; SG.addLayer(m);
+});
+function buildOut() {
+  if (outBuilt) return; outBuilt = true;
+  DIST.forEach(function (d) {
+    if (!d.o.length) return;
+    var g = L.layerGroup();
+    d.o.forEach(function (p) { L.circleMarker([p[0], p[1]], {radius: 2.4, color: "#fff", weight: 0.5, fillColor: NC.outlet, fillOpacity: 0.9})
+      .bindTooltip("Outlet " + e(p[2]) + " · " + e(d.nm)).addTo(g); });
+    d._og = g; if (dOk(d.dd)) OG.addLayer(g);
+  });
+}
+function dOk(di) { return !dsel || dsel.has(di); }
+function inG(g, l, want) { if (want && !g.hasLayer(l)) g.addLayer(l); else if (!want && g.hasLayer(l)) g.removeLayer(l); }
+function onMap(l, want) { if (want && !map.hasLayer(l)) map.addLayer(l); else if (!want && map.hasLayer(l)) map.removeLayer(l); }
+function applyMap(fit) {
+  var vg = buildMode(mode);
+  Object.keys(VG).forEach(function (m) { Object.keys(VG[m].groups).forEach(function (k) { onMap(VG[m].groups[k], m === mode && VG[m].on[k]); }); });
+  vg.items.forEach(function (it) { inG(vg.groups[it.k], it.l, dOk(it.d) && (mode !== "overall" || it.p >= curPop)); });
+  collapseAll();
+  DIST.forEach(function (d) { if (d._mk) inG(DG, d._mk, dOk(d.dd)); if (d._og) inG(OG, d._og, dOk(d.dd)); });
+  SPK.forEach(function (s) { inG(SG, s._m, dOk(s[6])); });
+  onMap(DG, net.dist); onMap(SG, net.spk); onMap(OG, net.out);
+  if (fit) fitView();
+}
+function fitView() {
+  if (!dsel) { map.flyToBounds(ALL, {padding: [20, 20], duration: 0.8}); return; }
+  var b = null;
+  VG[mode].items.forEach(function (it) { if (dsel.has(it.d)) { var bb = it.l.getBounds(); if (bb.isValid()) b = b ? b.extend(bb) : L.latLngBounds(bb.getSouthWest(), bb.getNorthEast()); } });
+  if (b && b.isValid()) map.flyToBounds(b, {padding: [30, 30], duration: 0.8});
+}
+var lp = document.getElementById("lp");
+function renderPanel() {
+  var vg = buildMode(mode), md = MDc();
+  var h = '<div class="lph"><b>Layers</b><button class="ic" id="lpmin">–</button></div><div class="lpb">' +
+          '<div class="acts"><button class="act" data-a="all">Show all</button><button class="act" data-a="none">Unmark all</button><button class="act" data-a="col">Collapse</button></div>' +
+          '<div class="sec"><div class="gt">' + e(md.label) + ' villages' + (mode === "overall" && curPop ? ' · pop ' + popLab(curPop) : '') + '</div><div class="chips">';
+  md.chips.forEach(function (c) {
+    var st = PS[c.s];
+    h += '<button class="chip' + (vg.on[c.k] ? ' on' : '') + '" data-k="' + e(c.k) + '"><span class="sw" style="background:' + st.fill +
+         ';border-color:' + st.line + ';border-style:' + (DASH[c.t] ? 'dashed' : 'solid') + '"></span><span class="lb">' + e(c.lab) +
+         '</span><span class="ct">' + fmt(c.v) + '</span></button>';
+  });
+  h += '</div></div><div class="sec"><div class="gt">Network</div><div class="chips">' +
+       '<button class="chip' + (net.dist ? ' on' : '') + '" data-n="dist"><span class="dot sq" style="background:' + NC.dist + '"></span><span class="lb">Distributors (click → outlets)</span><span class="ct">' + fmt(NET.dist) + '</span></button>' +
+       '<button class="chip' + (net.spk ? ' on' : '') + '" data-n="spk"><span class="dot" style="background:' + NC.spoke + '"></span><span class="lb">Spokes</span><span class="ct">' + fmt(NET.spk) + '</span></button>' +
+       '<button class="chip' + (net.out ? ' on' : '') + '" data-n="out"><span class="dot" style="background:' + NC.outlet + '"></span><span class="lb">All outlets</span><span class="ct">' + fmt(NET.geo) + '</span></button>' +
+       '</div></div><div class="sec"><div class="seg" id="bseg">' + BASES.map(function (b) { return '<button>' + e(b.label) + '</button>'; }).join("") + '</div></div></div>';
+  lp.innerHTML = h;
+  L.DomEvent.disableClickPropagation(lp); L.DomEvent.disableScrollPropagation(lp);
+  document.getElementById("lpmin").onclick = function () { lp.classList.toggle("min"); this.textContent = lp.classList.contains("min") ? "+" : "–"; };
+  lp.querySelectorAll(".chip[data-k]").forEach(function (b) { b.onclick = function () { var k = b.getAttribute("data-k"); vg.on[k] = !vg.on[k]; b.classList.toggle("on", vg.on[k]); applyMap(false); }; });
+  lp.querySelectorAll(".chip[data-n]").forEach(function (b) { b.onclick = function () { var n = b.getAttribute("data-n"); net[n] = !net[n]; if (n === "out" && net[n]) buildOut(); b.classList.toggle("on", net[n]); applyMap(false); }; });
+  lp.querySelectorAll(".act").forEach(function (b) { b.onclick = function () {
+    var a = b.getAttribute("data-a");
+    if (a === "col") { collapseAll(); return; }
+    Object.keys(vg.on).forEach(function (k) { vg.on[k] = a === "all"; });
+    net.dist = net.spk = a === "all"; if (a === "none") net.out = false;
+    renderPanel(); applyMap(false);
+  }; });
+  var bseg = document.getElementById("bseg");
+  Array.prototype.forEach.call(bseg.children, function (c, j) { c.onclick = function () { baseIdx = j; setBase(map, tiles, j, bseg); }; });
+  setBase(map, tiles, baseIdx, bseg);
+}
+var kpis = document.getElementById("kpis");
+function renderKPI() {
+  var md = MDc(), h = "";
+  md.blocks.forEach(function (b) {
+    var T = b.rows.Total, pop = "";
+    if (mode === "overall") {
+      pop = '<div class="popf">' + MD.overall.bandlist.map(function (t) {
+              return '<button data-pop="' + t + '" class="' + (t === curPop ? "on" : "") + '">' + popLab(t) + '</button>';
+            }).join("") + '<small>' + (curPop ? "villages & towns with population ≥ " + fmt(curPop) : "all villages & towns") + '</small></div>';
+    }
+    h += '<div class="mk" style="--acc:' + b.acc + '"><div class="mh"><span class="tag">' + e(b.tag) + '</span><b>' + e(b.title) +
+         (mode === "overall" && curPop ? ' · pop ' + popLab(curPop) : '') + '</b></div>' + pop +
+         '<table class="kt"><thead><tr><th></th><th>Villages</th><th>Pop</th><th>Outlets</th><th>Distr.</th></tr></thead><tbody>';
+    ["Covered", "Uncovered"].forEach(function (s) { var r = b.rows[s];
+      h += '<tr class="' + s.toLowerCase() + '"><td><i class="dt"></i>' + s + '</td><td>' + fmt(r.v) + ' <small>' + pc(r.v, T.v) + '%</small></td>' +
+           '<td>' + fmtc(r.pop) + ' <small>' + pc(r.pop, T.pop) + '%</small></td><td>' + fmt(r.out) + '</td><td>' + fmt(r.dn) + '</td></tr>'; });
+    h += '<tr class="tot"><td>Total</td><td>' + fmt(T.v) + '</td><td>' + fmtc(T.pop) + '</td><td>' + fmt(T.out) + '</td><td>' + fmt(T.dn) + '</td></tr></tbody></table></div>';
+  });
+  h += '<div class="mk" style="--acc:#334155"><div class="mh"><span class="tag">NET</span><b>Distribution network · ' + e(STATE) + '</b></div><div class="nets">' +
+       '<div><b>' + fmt(NET.dist) + '</b><span>Distributors</span></div><div><b>' + fmt(NET.outlets) + '</b><span>Outlets · ' + pc(NET.geo, NET.outlets) + '% geotagged</span></div>' +
+       '<div><b>' + fmt(NET.spk) + '</b><span>Spokes</span></div><div><b>' + (NET.dist ? (NET.outlets / NET.dist).toFixed(1) : "0") + '</b><span>Outlets / distributor</span></div></div></div>';
+  kpis.innerHTML = h;
+  kpis.style.gridTemplateColumns = "repeat(" + Math.min(md.blocks.length + 1, 4) + ",minmax(0,1fr))";
+  kpis.querySelectorAll(".popf button").forEach(function (btn) {
+    btn.onclick = function () {
+      curPop = +btn.getAttribute("data-pop");
+      dsel = null;
+      renderKPI(); renderPanel(); renderDistricts(); applyMap(false);
+    };
+  });
+}
+var dchips = document.getElementById("dchips"), dtable = document.getElementById("dtable");
+function drow(first, lab, r, cls, tcol) {
+  return '<tr class="' + (cls || "") + '">' + first + (tcol ? '<td class="l">' + lab + '</td>' : '') +
+         '<td>' + fmt(r.v) + '</td><td class="g">' + fmt(r.cov) + '</td><td>' + pc(r.cov, r.v) + '%</td><td>' + pc(r.popc, r.pop) + '%</td>' +
+         '<td>' + fmt(r.out) + '</td><td>' + fmt(r.dn) + '</td></tr>';
+}
+function renderDistricts() {
+  var md = MDc(), tcol = mode === "p1p2";
+  document.getElementById("dcount").textContent = md.districts.length + " districts" + (mode === "overall" && curPop ? " · pop " + popLab(curPop) : "");
+  dchips.innerHTML = '<button class="sc on" data-k="all">All districts<small>' + md.districts.length + '</small></button>' +
+    md.districts.map(function (r) { return '<button class="sc" data-k="' + r.di + '">' + e(r.name) + '<small>' + fmt(r.tot.v) + '</small></button>'; }).join("");
+  var h = '<table class="stt"><thead><tr><th class="l">District</th>' + (tcol ? '<th class="l">Type</th>' : '') +
+          '<th>Vill.</th><th>Covered</th><th>Cov %</th><th>Pop cov</th><th>Outlets</th><th>Distr.</th></tr></thead>';
+  md.districts.forEach(function (r) {
+    var sn = '<button class="sbtn" data-k="' + r.di + '">' + e(r.name) + '</button>', body = "";
+    if (tcol && r.types.length) {
+      var first = '<td class="sn" rowspan="' + (r.types.length + 1) + '">' + sn + '</td>';
+      r.types.forEach(function (t, j) { body += drow(j === 0 ? first : "", '<i class="tg" style="background:' + (ACC[t.t] || "#555") + '">' + e(t.t) + '</i>', t, "", true); });
+      body += drow("", "Total", r.tot, "sub", true);
+    } else body = drow('<td class="sn">' + sn + '</td>', "", r.tot, "", tcol);
+    h += '<tbody data-k="' + r.di + '" data-v="' + r.tot.v + '" data-cov="' + r.tot.cov + '" data-pop="' + r.tot.pop + '" data-popc="' + r.tot.popc + '" data-out="' + r.tot.out + '">' + body + '</tbody>';
+  });
+  var G = md.grand;
+  h += '<tfoot><tr><td class="l" ' + (tcol ? 'colspan="2"' : '') + ' id="ftl">All districts</td><td id="ftv">' + fmt(G.v) + '</td><td class="g" id="ftc">' + fmt(G.cov) +
+       '</td><td id="ftp">' + pc(G.cov, G.v) + '%</td><td id="ftpp">' + pc(G.popc, G.pop) + '%</td><td id="fto">' + fmt(G.out) + '</td><td id="ftd">' + fmt(G.dn) + '</td></tr></tfoot></table>';
+  dtable.innerHTML = h;
+  document.querySelectorAll("#dchips .sc, #dtable .sbtn").forEach(function (b) {
+    b.onclick = function () { var k = b.getAttribute("data-k");
+      if (k === "all") dsel = null; else { k = +k; dsel = dsel || new Set(); if (dsel.has(k)) dsel.delete(k); else dsel.add(k); if (!dsel.size) dsel = null; }
+      applyDistricts(); };
+  });
+}
+function applyDistricts() {
+  var all = !dsel, v = 0, cov = 0, pop = 0, popc = 0, out = 0;
+  document.querySelectorAll("#dchips .sc").forEach(function (b) { var k = b.getAttribute("data-k"); b.classList.toggle("on", k === "all" ? all : dsel.has(+k)); });
+  document.querySelectorAll("#dtable .sbtn").forEach(function (b) { b.classList.toggle("on", !all && dsel.has(+b.getAttribute("data-k"))); });
+  document.querySelectorAll("#dtable tbody").forEach(function (b) {
+    var show = all || dsel.has(+b.getAttribute("data-k")); b.style.display = show ? "" : "none";
+    if (show) { v += +b.dataset.v; cov += +b.dataset.cov; pop += +b.dataset.pop; popc += +b.dataset.popc; out += +b.dataset.out; }
+  });
+  var G = MDc().grand;
+  document.getElementById("ftl").textContent = all ? "All districts" : "Selected";
+  document.getElementById("ftv").textContent = fmt(v); document.getElementById("ftc").textContent = fmt(cov);
+  document.getElementById("ftp").textContent = pc(cov, v) + "%"; document.getElementById("ftpp").textContent = pc(popc, pop) + "%";
+  document.getElementById("fto").textContent = fmt(out); document.getElementById("ftd").textContent = all ? fmt(G.dn) : "—";
+  document.getElementById("dinfo").textContent = all ? "Showing all districts · click a district to filter" :
+    "Filtered: " + Array.from(dsel).map(function (k) { return DL[k]; }).join(", ");
+  applyMap(true);
+}
+document.getElementById("dclear").onclick = function () { dsel = null; applyDistricts(); };
+function setMode(m) {
+  mode = m; dsel = null;
+  document.querySelectorAll("#modeSw button").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-m") === m); });
+  renderKPI(); renderPanel(); renderDistricts(); applyMap(true);
+  setTimeout(function () { map.invalidateSize(); }, 50);
+}
+document.querySelectorAll("#modeSw button").forEach(function (b) { b.onclick = function () { setMode(b.getAttribute("data-m")); }; });
+
+/* ================= ANOMALY MAP ================= */
+var amap = null, atiles, active, hlg, built = {}, aBucket = DEFB, aAsm = null, svgR;
+function initAnom() {
+  if (amap) { amap.invalidateSize(); return; }
+  amap = L.map("amap", {preferCanvas: true}); amap.fitBounds(ALL); L.control.scale({imperial: false}).addTo(amap);
+  atiles = mkTiles();
+  var box = document.getElementById("abs");
+  box.innerHTML = BASES.map(function (b) { return '<button>' + e(b.label) + '</button>'; }).join("");
+  Array.prototype.forEach.call(box.children, function (c, j) { c.onclick = function () { setBase(amap, atiles, j, box); }; });
+  setBase(amap, atiles, BIDX, box);
+  active = L.layerGroup().addTo(amap); hlg = L.layerGroup().addTo(amap); svgR = L.svg();
+  amap.on("zoomend", function () { amap.getContainer().classList.toggle("showlbl", amap.getZoom() >= 11); });
+  renderAnom(false);
+}
+var BKI = {}; BK.forEach(function (b) { BKI[b.id] = b; });
+function buildBucket(b) {
+  if (built[b.id]) return built[b.id];
+  built[b.id] = b.items.map(function (it, k) {
+    var il = L.featureGroup();
+    if (it.pc && GEO[it.pc]) L.geoJSON({type: "Feature", geometry: GEO[it.pc]}, {style: {color: b.color, weight: 2, fillColor: b.color, fillOpacity: 0.15}}).addTo(il);
+    if (it.line) L.polyline(it.line, {color: b.color, weight: 2, opacity: 0.9, dashArray: "5 4"}).addTo(il);
+    it.pts.forEach(function (p, j) {
+      var mk = L.circleMarker([p[0], p[1]], {radius: j === 0 ? 6 : 4.5, color: "#fff", weight: 1.5, fillColor: j === 0 ? b.color : "#475569", fillOpacity: 1});
+      mk.bindTooltip(e(p[2]), j === 0 ? {permanent: true, direction: "top", offset: [0, -7], className: "lbl"} : {});
+      mk.addTo(il);
+    });
+    il.bindTooltip("<b>" + e(it.lb) + "</b><br>" + e(it.sub) + "<br>ASM: " + it.asm.map(function (a) { return e(a) + (it.inf.indexOf(a) > -1 ? " (inferred)" : ""); }).join(", ") +
+                   (it.dse.length ? "<br>DSE: " + e(it.dse.slice(0, 4).join(", ")) + (it.dse.length > 4 ? " …" : "") : ""), {sticky: true});
+    il.on("click", function () { if (aBucket !== b.id) selectBucket(b.id, false); markItem(k); focus(b.id, k); });
+    il._asm = it.asm; il._has = it.pts.length > 0;
+    return il;
+  });
+  return built[b.id];
+}
+function renderAnom(fly) {
+  if (!amap) return;
+  active.clearLayers(); hlg.clearLayers();
+  var b = BKI[aBucket], fg = L.featureGroup(), n = 0;
+  buildBucket(b).forEach(function (il) { if ((!aAsm || il._asm.indexOf(aAsm) > -1) && il._has) { fg.addLayer(il); n++; } });
+  active.addLayer(fg);
+  document.getElementById("badge").innerHTML = '<i style="background:' + b.color + '"></i>' + e(AM[b.id].name) + (aAsm ? " · " + e(aAsm) : "") + " · " + fmt(n) + " shown";
+  var bb = n ? fg.getBounds() : null;
+  if (bb && bb.isValid()) { if (fly) amap.flyToBounds(bb, {padding: [40, 40], maxZoom: 13, duration: 0.8}); else amap.fitBounds(bb, {padding: [40, 40], maxZoom: 13}); }
+  else if (fly) amap.flyToBounds(ALL, {padding: [20, 20], duration: 0.8});
+}
+function focus(bid, idx) {
+  if (!amap) return;
+  var il = buildBucket(BKI[bid])[idx]; if (!il || !il._has) return;
+  var bb = il.getBounds(); amap.flyToBounds(bb, {padding: [80, 80], maxZoom: 15, duration: 0.8});
+  hlg.clearLayers(); L.circleMarker(bb.getCenter(), {renderer: svgR, radius: 16, color: "#111827", weight: 3, fill: false, className: "hl", interactive: false}).addTo(hlg);
+}
+var ilist = document.getElementById("ilist"), ilh = document.getElementById("ilh"), alist = document.getElementById("alist"), ash = document.getElementById("ash");
+var bks = document.querySelectorAll(".bk");
+function renderAsm() {
+  var m = AM[aBucket], arr = AA[aBucket] || [], mx = arr.length ? arr[0][1] : 1;
+  alist.style.setProperty("--bc", m.color);
+  ash.innerHTML = "Responsible ASMs <small>" + e(m.name) + " · " + arr.length + "</small>";
+  var h = '<div class="ar' + (aAsm === null ? " on" : "") + '" data-a=""><span class="an">All ASMs</span><span class="ab"><i style="width:100%"></i></span><span class="ac">' + fmt(m.total) + '</span><span></span></div>';
+  arr.forEach(function (x) {
+    h += '<div class="ar' + (aAsm === x[0] ? " on" : "") + '" data-a="' + e(x[0]) + '"><span class="an" title="' + e(x[0]) + '">' + e(x[0]) + '</span>' +
+         '<span class="ab"><i style="width:' + Math.max(4, Math.round(100 * x[1] / mx)) + '%"></i></span><span class="ac">' + fmt(x[1]) + '</span>' +
+         '<button class="rbtn" data-asm="' + e(x[0]) + '">' + ICON_DOC + 'Report</button></div>';
+  });
+  alist.innerHTML = arr.length ? h : '<div class="empty">No anomalies in this bucket.</div>';
+  alist.querySelectorAll(".ar").forEach(function (r) { r.onclick = function (ev) { if (ev.target.closest(".rbtn")) return; aAsm = r.getAttribute("data-a") || null; renderAsm(); renderList(); renderAnom(true); }; });
+  alist.querySelectorAll(".rbtn").forEach(function (b) { b.onclick = function (ev) { ev.stopPropagation(); openReport(b.getAttribute("data-asm")); }; });
+}
+function renderList() {
+  var arr = AL[aBucket] || [], m = AM[aBucket], rows = [];
+  arr.forEach(function (it, i) { if (!aAsm || it.asm.indexOf(aAsm) > -1) rows.push([it, i]); });
+  ilh.innerHTML = '<span>' + (aAsm ? e(aAsm) : "All items") + ' <small>' + fmt(rows.length) + (m.total > CAP && !aAsm ? " of " + fmt(m.total) + " · first " + CAP : "") + '</small></span>' +
+                  (aAsm ? '<button class="rbtn" id="ilrep">' + ICON_DOC + 'Show report</button>' : "");
+  var ir = document.getElementById("ilrep"); if (ir) ir.onclick = function () { openReport(aAsm); };
+  if (!rows.length) { ilist.innerHTML = '<div class="empty">No items.</div>'; return; }
+  ilist.innerHTML = rows.map(function (x) { var it = x[0], i = x[1];
+    var who = it.asm.map(function (a) { var inf = it.inf.indexOf(a) > -1; return '<i class="wa' + (inf ? ' inf' : '') + '">ASM · ' + e(a) + (inf ? ' · inferred' : '') + '</i>'; }).join("") +
+              it.dse.slice(0, 4).map(function (d) { return '<i class="wd">DSE · ' + e(d) + '</i>'; }).join("") + (it.dse.length > 4 ? '<i class="wd">+' + (it.dse.length - 4) + ' DSE</i>' : '');
+    return '<button class="it" style="--ic:' + m.color + '" data-i="' + i + '"><b>' + e(it.lb) + '</b><span>' + e(it.sub) + '</span>' + (it.st ? '<em>' + e(it.st) + '</em>' : '') + '<div class="who">' + who + '</div></button>';
+  }).join("");
+  ilist.querySelectorAll(".it").forEach(function (r) { r.onclick = function () { markItem(+r.dataset.i); focus(aBucket, +r.dataset.i); }; });
+}
+function markItem(i) {
+  ilist.querySelectorAll(".it").forEach(function (r) { r.classList.toggle("on", +r.dataset.i === i); });
+  var row = ilist.querySelector('.it[data-i="' + i + '"]'); if (row) row.scrollIntoView({block: "nearest", behavior: "smooth"});
+}
+function selectBucket(id, fly) {
+  aBucket = id; aAsm = null;
+  bks.forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-b") === id); });
+  renderAsm(); renderList(); renderAnom(fly);
+}
+bks.forEach(function (b) { b.onclick = function () { selectBucket(b.getAttribute("data-b"), true); }; });
+var rptm = document.getElementById("rptm"), rpbody = document.getElementById("rpbody"), curRep = null;
+function distTxt(k) { if (k === null || k === undefined || k === "") return "—"; return k < 1 ? Math.round(k * 1000) + " m" : (+k).toFixed(1) + " km"; }
+function pairs(o) { return Object.keys(o).map(function (k) { return [k, o[k]]; }).sort(function (a, b) { return b[1] - a[1]; }); }
+function openReport(asm) {
+  var secs = [], total = 0, ds = {}, dse = {}, dist = {};
+  BORDER.forEach(function (bid) {
+    var rows = []; (AF[bid] || []).forEach(function (it, i) { if (it.asm.indexOf(asm) > -1) rows.push([it, i]); });
+    rows.forEach(function (x) { var it = x[0]; if (it.st) ds[it.st] = (ds[it.st] || 0) + 1;
+      (it.dse.length ? it.dse : [UNASG]).forEach(function (d) { dse[d] = (dse[d] || 0) + 1; });
+      it.dist.forEach(function (d) { dist[d] = (dist[d] || 0) + 1; }); });
+    total += rows.length; secs.push({bid: bid, rows: rows});
+  });
+  curRep = {asm: asm, secs: secs};
+  document.getElementById("rptTitle").textContent = "ASM report · " + asm;
+  var chip = function (o) { var p = pairs(o); return p.length ? p.map(function (x) { return '<i>' + e(x[0]) + ' · ' + fmt(x[1]) + '</i>'; }).join("") : '<i>—</i>'; };
+  var h = '<div class="rp-h"><div><h3>Anomaly report — ' + e(asm) + '</h3><p>' + e(STATE) + ' · distributor coverage · generated ' + e(GEN) + '</p></div>' +
+          '<div class="big">' + fmt(total) + '<small>anomalies to correct</small></div></div>';
+  h += '<div class="rp-sum">' + secs.map(function (s) { var m = AM[s.bid]; return '<div class="rp-card" style="--bc:' + m.color + '"><b>' + fmt(s.rows.length) + '</b><span>' + e(m.name) + '</span></div>'; }).join("") + '</div>';
+  h += '<div class="rp-meta"><div class="rp-box"><h4>Districts</h4><div class="chips2">' + chip(ds) + '</div></div>' +
+       '<div class="rp-box"><h4>DSEs involved</h4><div class="chips2">' + chip(dse) + '</div></div>' +
+       '<div class="rp-box"><h4>Distributors involved</h4><div class="chips2">' + chip(dist) + '</div></div></div>';
+  secs.forEach(function (s) { if (!s.rows.length) return; var m = AM[s.bid];
+    h += '<div class="rp-sec" style="--bc:' + m.color + '"><h4><i></i>' + e(m.name) + ' <small>' + fmt(s.rows.length) + ' items</small></h4>' +
+         '<div class="rp-why"><div class="w"><b>What went wrong</b>' + e(m.wrong) + '</div><div class="f"><b>How to fix</b>' + e(m.action) + '</div></div>' +
+         '<table class="rpt"><thead><tr><th>#</th><th>Item</th><th>Problem</th><th>District · Village</th><th>Distributor</th><th>DSE</th><th style="text-align:right">Distance</th><th class="noprint"></th></tr></thead><tbody>' +
+         s.rows.map(function (x, n) { var it = x[0], i = x[1], inf = it.inf.indexOf(asm) > -1;
+           return '<tr><td class="num">' + (n + 1) + '</td><td><b>' + e(it.lb) + '</b>' + (inf ? '<span class="inf">ASM inferred</span>' : '') + '</td><td>' + e(it.sub) + '</td>' +
+                  '<td>' + e(it.st || "—") + (it.vil ? " · " + e(it.vil) : "") + '</td><td>' + e(it.dist.join(", ") || "—") + '</td><td>' + e(it.dse.join(", ") || "—") + '</td>' +
+                  '<td class="num">' + distTxt(it.km) + '</td><td class="noprint">' + (i < CAP ? '<button class="mapb" data-b="' + s.bid + '" data-i="' + i + '">Map</button>' : '') + '</td></tr>';
+         }).join("") + '</tbody></table></div>'; });
+  if (!total) h += '<div class="empty">No anomalies for this ASM.</div>';
+  h += '<div class="rp-foot">Distances are straight-line. "ASM inferred" = ASM was blank and was taken from the same distributor, the same village, or the nearest distributor. Shared anomalies (distributor pairs, territory conflicts, shared geotags) appear in every involved ASM\'s report.</div>';
+  rpbody.innerHTML = h;
+  rpbody.querySelectorAll(".mapb").forEach(function (b) { b.onclick = function () {
+    rptm.classList.remove("on"); showTab("v_anom");
+    setTimeout(function () { selectBucket(b.getAttribute("data-b"), false); aAsm = asm; renderAsm(); renderList(); renderAnom(false);
+      var i = +b.getAttribute("data-i"); markItem(i); focus(aBucket, i); }, 120);
+  }; });
+  document.getElementById("scm").classList.remove("on"); rptm.classList.add("on"); rptm.querySelector(".mtw").scrollTop = 0;
+}
+function csvCell(v) { v = v === null || v === undefined ? "" : String(v); return '"' + v.replace(/"/g, '""') + '"'; }
+document.getElementById("rpCsv").onclick = function () {
+  if (!curRep) return;
+  var lines = [["ASM", "Bucket", "Item", "Problem", "District", "Village", "Distributor", "DSE", "Distance (km)", "ASM inferred", "How to fix"].map(csvCell).join(",")];
+  curRep.secs.forEach(function (s) { var m = AM[s.bid]; s.rows.forEach(function (x) { var it = x[0];
+    lines.push([curRep.asm, m.name, it.lb, it.sub, it.st, it.vil, it.dist.join(", "), it.dse.join(", "), it.km === null ? "" : it.km, it.inf.indexOf(curRep.asm) > -1 ? "Yes" : "", m.action].map(csvCell).join(",")); }); });
+  var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + lines.join("\r\n")], {type: "text/csv;charset=utf-8"}));
+  a.download = "Anomaly_Report_" + curRep.asm.replace(/[^A-Za-z0-9]+/g, "_") + ".csv"; document.body.appendChild(a); a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+};
+document.getElementById("rpPrint").onclick = function () { document.body.classList.add("printing"); window.print(); };
+window.addEventListener("afterprint", function () { document.body.classList.remove("printing"); });
+document.getElementById("rpx").onclick = function () { rptm.classList.remove("on"); };
+rptm.onclick = function (ev) { if (ev.target === rptm) rptm.classList.remove("on"); };
+var scm = document.getElementById("scm");
+document.getElementById("scbtn").onclick = function () { scm.classList.add("on"); };
+document.getElementById("scx").onclick = function () { scm.classList.remove("on"); };
+scm.onclick = function (ev) { if (ev.target === scm) scm.classList.remove("on"); };
+scm.querySelectorAll(".rbtn").forEach(function (b) { b.onclick = function () { openReport(b.getAttribute("data-asm")); }; });
+document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") { scm.classList.remove("on"); rptm.classList.remove("on"); } });
+
+/* ================= TABS / FULLSCREEN ================= */
+var tgl = document.getElementById("tgl"), modeSw = document.getElementById("modeSw");
+function showTab(v) {
+  document.querySelectorAll(".tab").forEach(function (x) { x.classList.toggle("on", x.getAttribute("data-v") === v); });
+  document.querySelectorAll(".view").forEach(function (x) { x.classList.toggle("on", x.id === v); });
+  var main = v === "v_main"; tgl.style.display = main ? "" : "none"; modeSw.style.display = main ? "" : "none";
+  setTimeout(function () { if (main) map.invalidateSize(); else initAnom(); }, 60);
+}
+document.querySelectorAll(".tab").forEach(function (b) { b.onclick = function () { showTab(b.getAttribute("data-v")); }; });
+tgl.onclick = function () { document.body.classList.toggle("noside"); tgl.textContent = document.body.classList.contains("noside") ? "Show districts" : "Hide districts";
+  setTimeout(function () { map.invalidateSize(); }, 480); };
+var fsb = document.getElementById("fsb");
+fsb.onclick = function () { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(function () {}); else document.exitFullscreen().catch(function () {}); };
+document.addEventListener("fullscreenchange", function () { var on = !!document.fullscreenElement; fsb.classList.toggle("on", on);
+  fsb.querySelector("span").textContent = on ? "Exit fullscreen" : "View fullscreen"; setTimeout(function () { map.invalidateSize(); if (amap) amap.invalidateSize(); }, 200); });
+window.addEventListener("resize", function () { map.invalidateSize(); if (amap) amap.invalidateSize(); });
+
+setMode(mode);
+selectBucket(DEFB, false);
+})();
+</script></body></html>
